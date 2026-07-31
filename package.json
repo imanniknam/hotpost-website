@@ -2,16 +2,36 @@
   "name": "hotpost",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "seed": "payload run src/scripts/seed.ts",
+    "create:admin": "payload run src/scripts/create-admin.ts",
+    "import:woo": "payload run src/scripts/import-woo.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.5.7",
+    "@payloadcms/db-sqlite": "^3.87.0",
+    "@payloadcms/next": "^3.87.0",
+    "@payloadcms/richtext-lexical": "^3.87.0",
+    "clsx": "^2.1.1",
+    "graphql": "^16.14.2",
     "next": "16.2.12",
+    "payload": "^3.87.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.83.0",
+    "sharp": "^0.35.3",
+    "tailwind-merge": "^3.6.0",
+    "vazirmatn": "^33.0.3",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

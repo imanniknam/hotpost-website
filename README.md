@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# هات پست — h0tpost.ir
 
-## Getting Started
+سایت اختصاصی هات پست: معرفی خدمات پستی و فروشگاه ملزومات بسته‌بندی و چاپ.
 
-First, run the development server:
+## استک
+
+| لایه | فناوری |
+|---|---|
+| فریم‌ورک | Next.js 16 (App Router) + React 19 + TypeScript |
+| مدیریت محتوا | Payload CMS 3 — داخل همان اپ Next اجرا می‌شود |
+| دیتابیس | SQLite (توسعه). برای پروداکشن ← بخش «دیتابیس» |
+| استایل | Tailwind CSS v4 |
+| فونت | Vazirmatn (SIL OFL)، self-host شده |
+| سبد خرید | Zustand + localStorage |
+
+## راه‌اندازی
 
 ```bash
+npm install
+cp .env.example .env      # PAYLOAD_SECRET را پر کنید
+npm run seed              # محتوای اولیه از اسناد تیم محتوا
+npm run create:admin -- admin@h0tpost.ir "<password>" "مدیر هات پست"
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- سایت: http://localhost:3000
+- پنل مدیریت: http://localhost:3000/admin
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## اسکریپت‌ها
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| دستور | کار |
+|---|---|
+| `npm run dev` | سرور توسعه |
+| `npm run build` / `npm start` | بیلد و اجرای پروداکشن |
+| `npm run seed` | وارد کردن محتوای اولیه (پاک‌کننده — کالکشن‌ها را خالی می‌کند) |
+| `npm run create:admin -- <email> <pass> "<name>"` | ساخت کاربر ادمین |
+| `npm run import:woo` | گزارش مهاجرت محصولات از ووکامرس (بدون نوشتن) |
+| `npm run import:woo -- --apply` | اعمال واقعی مهاجرت |
+| `npm run generate:types` | تولید مجدد `src/payload-types.ts` پس از تغییر کالکشن‌ها |
+| `npm run generate:importmap` | تولید مجدد import map پنل ادمین |
 
-## Learn More
+پس از هر تغییر در `src/collections/` یا `src/globals/` باید `generate:types` را اجرا کنید.
 
-To learn more about Next.js, take a look at the following resources:
+## ساختار
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/(frontend)/     صفحات عمومی سایت
+  app/(payload)/      پنل ادمین و REST/GraphQL API
+  collections/        محصولات، دسته‌بندی‌ها، خدمات، پرسش‌ها، رسانه، کاربران
+  globals/            صفحه اصلی، درباره ما، تنظیمات سایت
+  components/         کامپوننت‌های UI
+  lib/                کوئری‌ها، سبد خرید، فرمت اعداد فارسی
+  hooks/revalidate.ts پاک‌سازی کش پس از ویرایش محتوا
+  scripts/            seed، ساخت ادمین، مهاجرت ووکامرس
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## نکات پیاده‌سازی
 
-## Deploy on Vercel
+**RTL** — کل سایت `dir="rtl"` است. در Tailwind از پراپرتی‌های منطقی استفاده کنید
+(`ms-`/`me-`/`ps-`/`pe-`/`start-`/`end-`) نه `ml-`/`mr-`/`left-`/`right-`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**فونت** — Vazirmatn از پکیج npm برداشته و در `src/fonts/` قرار گرفته و با
+`next/font/local` لود می‌شود. عمداً از `next/font/google` استفاده نشده: آن روش
+فونت را هنگام **build** دانلود می‌کند و Google Fonts از سرورهای ایرانی قابل
+اتکا نیست.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**قیمت‌ها** — به **تومان** و به صورت عدد صحیح ذخیره می‌شوند (مثلاً `13490`).
+نمایش با `formatPrice` که ارقام فارسی و جداکننده هزارگان می‌گذارد.
+
+**کش** — صفحات فرانت پیش‌رندر می‌شوند. هوک‌های `src/hooks/revalidate.ts` روی
+همه کالکشن‌ها و گلوبال‌ها نصب‌اند و پس از هر ذخیره در پنل، کش را پاک می‌کنند.
+این هوک‌ها هنگام اجرای اسکریپت‌های CLI بی‌اثر می‌شوند (کانتکست Next وجود ندارد)؛
+یعنی `npm run seed` روی یک سرور در حال اجرا کش را تازه نمی‌کند — بعد از seed
+سرور را ری‌استارت کنید.
+
+## دیتابیس
+
+توسعه روی SQLite است (`hotpost.db`). برای پروداکشن اگر Postgres می‌خواهید:
+
+```bash
+npm install @payloadcms/db-postgres
+```
+
+سپس در `src/payload.config.ts` آداپتر را عوض کنید و `DATABASE_URI` را روی
+رشته اتصال Postgres بگذارید. بقیه کد تغییری نمی‌کند.
+
+## مهاجرت از سایت فعلی
+
+سایت فعلی روی WordPress + WooCommerce است. `npm run import:woo` محصولات را
+از REST API آن می‌کشد و دو اصلاح انجام می‌دهد:
+
+1. **قیمت‌ها** — روی سایت فعلی هزار برابر هستند (کارتن سایز ۲ با قیمت
+   ۱۳,۴۹۰,۰۰۰ تومان). اسکریپت بر `WOO_PRICE_DIVISOR` (پیش‌فرض ۱۰۰۰) تقسیم می‌کند.
+2. **دسته‌بندی** — همه محصولات فعلی «دسته‌بندی‌نشده» هستند. دسته از روی نام
+   محصول و قواعد `CATEGORY_RULES` استنتاج می‌شود. هر محصولی که تطبیق نخورد
+   وارد **نمی‌شود** و در انتهای گزارش برای تخصیص دستی فهرست می‌شود.
+
+اول بدون `--apply` اجرا کنید و گزارش را با کارفرما چک کنید.
+
+نیازمند کلید read-only از: WooCommerce → Settings → Advanced → REST API.
+
+## استقرار
+
+Vercel از ایران در دسترس نیست. روی هاست ایرانی (آروان‌کلاد، پارس‌پک،
+ایران‌سرور) با Node.js و PM2 یا Docker اجرا کنید:
+
+```bash
+npm ci && npm run build && npm start
+```
+
+`public/media` و فایل دیتابیس باید بین دیپلوی‌ها حفظ شوند (volume یا مسیر ثابت).
+
+## کارهای باقی‌مانده
+
+- [ ] اتصال درگاه پرداخت (زرین‌پال یا زیبال) — دکمه پرداخت فعلاً غیرفعال است
+- [ ] فرم «ثبت درخواست قرارداد آنلاین»
+- [ ] پنل مشتری: کد رهگیری و رسید الکترونیک مالی
+- [ ] پیامک (کاوه‌نگار)
+- [ ] ۳۰۱ redirect از URLهای ووکامرس فعلی برای حفظ سئو
+- [ ] `sitemap.xml` و `robots.txt`
+- [ ] بارگذاری تصاویر واقعی (هیرو، درباره ما، آیکون خدمات)
+- [ ] نماد اعتماد الکترونیکی (اینماد) برای فروشگاه

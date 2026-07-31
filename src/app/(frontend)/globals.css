@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-vazirmatn), system-ui, sans-serif;
+
+  /* Brand palette sampled from the existing hotpost identity (orange + charcoal). */
+  --color-brand-50: #fff4ed;
+  --color-brand-100: #ffe6d5;
+  --color-brand-200: #fec9aa;
+  --color-brand-300: #fda474;
+  --color-brand-400: #fb733c;
+  --color-brand-500: #f85d1d;
+  --color-brand-600: #e9450c;
+  --color-brand-700: #c1330c;
+  --color-brand-800: #992b12;
+  --color-brand-900: #7b2712;
+
+  --color-ink-500: #6b7280;
+  --color-ink-700: #374151;
+  --color-ink-900: #17212f;
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6f7f9;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink-900);
+    /* Persian text needs a little more leading than the Latin default. */
+    line-height: 1.9;
+  }
+
+  /* Prices and phone numbers align better with tabular figures. */
+  .nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .container-hp {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+    max-width: 80rem;
+  }
+}

@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# SQLite database (local dev data; production DB lives on the server)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Payload media uploads (user content, not source)
+/public/media
+
+# Payload generates these from the config; regenerate with:
+#   npm run generate:types && npm run generate:importmap
