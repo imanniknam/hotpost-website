@@ -17,9 +17,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.5.7",
+    "@payloadcms/db-postgres": "^3.87.0",
     "@payloadcms/db-sqlite": "^3.87.0",
     "@payloadcms/next": "^3.87.0",
     "@payloadcms/richtext-lexical": "^3.87.0",
+    "@payloadcms/storage-vercel-blob": "^3.87.0",
     "clsx": "^2.1.1",
     "graphql": "^16.14.2",
     "motion": "^12.43.0",

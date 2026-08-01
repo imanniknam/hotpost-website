@@ -3,8 +3,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Media is served from Payload's local upload handler.
-    remotePatterns: [],
+    // Locally, uploads are served from public/media as same-origin paths and
+    // need no entry here. On Vercel they come from Blob, which is a different
+    // origin — next/image refuses any remote host that is not listed.
+    remotePatterns: [
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+    ],
   },
 };
 

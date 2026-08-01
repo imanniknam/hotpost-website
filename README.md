@@ -115,16 +115,83 @@ npm install @payloadcms/db-postgres
 
 قیمت واقعی محصولات باید از کارفرما گرفته و در پنل وارد شود.
 
-## استقرار
+## استقرار روی Vercel
 
-Vercel از ایران در دسترس نیست. روی هاست ایرانی (آروان‌کلاد، پارس‌پک،
-ایران‌سرور) با Node.js و PM2 یا Docker اجرا کنید:
+> **دسترسی:** Vercel آی‌پی‌های ایران را مسدود می‌کند. بازدیدکننده‌ی داخل ایران
+> بدون VPN این دامنه را باز نمی‌کند. برای نمایش به کارفرما با VPN مشکلی نیست،
+> ولی **این محیط پروداکشن نهایی نیست** — دامنه `h0tpost.ir` باید روی هاست
+> ایرانی بالا بیاید.
+
+سه چیز روی Vercel با نسخه لوکال فرق دارد و هر سه در کد دیده شده‌اند:
+
+| مورد | لوکال | Vercel | چرا |
+|---|---|---|---|
+| دیتابیس | SQLite | Postgres | فایل‌سیستم Vercel در زمان اجرا فقط‌خواندنی است |
+| آپلود فایل | `public/media` | Vercel Blob | همان دلیل |
+| ساخت اسکیما | خودکار | migration | Payload در `NODE_ENV=production` اسکیما را push نمی‌کند |
+
+انتخاب آداپتر و استوریج در `src/payload.config.ts` بر اساس وجود متغیر محیطی
+انجام می‌شود، پس هیچ سوییچ دستی لازم نیست.
+
+### مرحله ۱ — دیتابیس و استوریج
+
+در داشبورد Vercel، به پروژه یک **Postgres** و یک **Blob store** وصل کنید
+(Storage → Create). Vercel خودش `POSTGRES_URL` و `BLOB_READ_WRITE_TOKEN` را
+تزریق می‌کند. اگر Neon جدا می‌سازید، connection string پول‌شده را دستی در
+Environment Variables بگذارید.
+
+### مرحله ۲ — متغیرهای محیطی
+
+در Settings → Environment Variables این دو را اضافه کنید:
+
+```
+PAYLOAD_SECRET        یک رشته تصادفی جدید (با رشته لوکال یکی نباشد)
+NEXT_PUBLIC_SITE_URL  https://<your-project>.vercel.app
+```
+
+### مرحله ۳ — ساخت migration (یک‌بار، از روی سیستم خودتان)
+
+این مرحله قابل رد کردن نیست. بدون فایل‌های migration، بیلد روی Vercel یک
+دیتابیس بدون جدول می‌بیند و شکست می‌خورد.
+
+```bash
+# connection string همان Postgres پروداکشن
+POSTGRES_URL="postgres://..." npx payload migrate:create initial
+git add src/migrations && git commit -m "Add initial Postgres migration"
+```
+
+`vercel.json` دستور بیلد را `payload migrate && next build` گذاشته، پس
+migrationها موقع هر دیپلوی اجرا می‌شوند.
+
+### مرحله ۴ — دیپلوی و پر کردن محتوا
+
+```bash
+vercel --prod
+```
+
+بعد از اولین دیپلوی، دیتابیس خالی است. محتوا را از روی سیستم خودتان پر کنید:
+
+```bash
+POSTGRES_URL="postgres://..." npm run seed
+POSTGRES_URL="postgres://..." npm run create:admin -- <email> <password> "مدیر"
+```
+
+سپس یک دیپلوی مجدد بزنید تا صفحات با محتوا پیش‌رندر شوند (`npm run seed` از
+CLI اجرا می‌شود و کش سرور در حال اجرا را پاک نمی‌کند — بخش «کش» را ببینید).
+
+تصاویر برند با `npm run import:assets` وارد می‌شوند؛ روی پروداکشن به Blob
+می‌روند چون توکن ست است.
+
+## استقرار روی هاست ایرانی (پروداکشن نهایی)
+
+برای دامنه اصلی، روی آروان‌کلاد / پارس‌پک / لیارا با Node.js اجرا کنید:
 
 ```bash
 npm ci && npm run build && npm start
 ```
 
-`public/media` و فایل دیتابیس باید بین دیپلوی‌ها حفظ شوند (volume یا مسیر ثابت).
+اینجا SQLite هم کافی است (متغیر `POSTGRES_URL` را ست نکنید)، ولی `public/media`
+و فایل دیتابیس باید بین دیپلوی‌ها روی volume ثابت بمانند.
 
 ## کارهای باقی‌مانده
 
