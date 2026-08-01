@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Image from "next/image";
+
 import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { SupportBanner } from "@/components/ui/SupportBanner";
@@ -64,7 +66,16 @@ export default async function ServicesPage() {
                 className="pointer-events-none absolute inset-y-0 start-0 w-1.5 bg-linear-to-b from-brand-400 to-brand-600"
               />
 
-              <div className="flex flex-wrap items-baseline gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                {typeof service.icon === "object" && service.icon?.url && (
+                  <Image
+                    src={service.icon.url}
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="size-12 object-contain"
+                  />
+                )}
                 <h2 className="text-2xl font-extrabold">{service.title}</h2>
                 {service.englishTitle && (
                   <span className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-bold text-white shadow-sm shadow-brand-500/25">

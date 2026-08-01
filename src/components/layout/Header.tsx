@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CartButton } from "./CartButton";
+import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 
 export const NAV_LINKS = [
@@ -15,11 +16,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-black/5 bg-white/80 backdrop-blur-xl">
       <div className="container-hp flex h-16 items-center gap-4">
-        <Link href="/" className="group flex items-center gap-2 text-lg font-extrabold">
-          <span className="bg-brand-gradient grid size-9 place-items-center rounded-xl text-white shadow-md shadow-brand-500/30 transition-shadow group-hover:shadow-lg group-hover:shadow-brand-500/40">
-            هـ
-          </span>
-          <span>هات پست</span>
+        <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
+          <Logo className="h-9 w-auto" />
+          <span className="sr-only">هات پست</span>
         </Link>
 
         <nav className="hidden flex-1 items-center gap-1 md:flex" aria-label="ناوبری اصلی">

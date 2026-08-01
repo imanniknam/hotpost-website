@@ -107,6 +107,15 @@ export default async function HomePage() {
                     className="pointer-events-none absolute inset-0 bg-linear-to-br from-brand-50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                   />
                   <span className="relative">
+                    {typeof service.icon === "object" && service.icon?.url && (
+                      <Image
+                        src={service.icon.url}
+                        alt=""
+                        width={56}
+                        height={56}
+                        className="mb-4 size-14 object-contain transition-transform duration-300 group-hover:scale-110"
+                      />
+                    )}
                     <h3 className="text-lg font-extrabold transition-colors group-hover:text-brand-600">
                       {service.title}
                     </h3>

@@ -15,6 +15,12 @@
   --color-brand-800: #992b12;
   --color-brand-900: #7b2712;
 
+  /* The logo pairs the orange flame with a deep violet wordmark, so violet is
+     a real brand colour, not a neutral. Used for secondary accents. */
+  --color-plum-500: #6d28a8;
+  --color-plum-600: #59198f;
+  --color-plum-700: #4a1275;
+
   --color-ink-500: #6b7280;
   --color-ink-700: #374151;
   --color-ink-900: #17212f;
