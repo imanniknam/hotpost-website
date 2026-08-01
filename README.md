@@ -161,19 +161,24 @@ PAYLOAD_SECRET        یک رشته تصادفی جدید (با رشته لوک�
 NEXT_PUBLIC_SITE_URL  https://<your-project>.vercel.app
 ```
 
-### مرحله ۴ — ساخت migration (یک‌بار)
+### مرحله ۴ — migration
 
-قابل رد کردن نیست. `npm run migrate` روی پوشه خالی با کد خروج صفر رد می‌شود،
-پس `scripts/preflight.mjs` قبل از بیلد جلویش را می‌گیرد و پیام واضح می‌دهد —
-وگرنه بیلد بعداً با خطای نامربوط می‌شکست.
+**این مرحله انجام شده و در ریپو کامیت است** (`src/migrations/`). فقط اگر
+کالکشن یا فیلدی را عوض کردید باید دوباره بسازید:
 
 ```bash
-npx vercel env pull .env.production.local   # connection string را می‌آورد
-POSTGRES_URL="$(grep '^POSTGRES_URL' .env.production.local | cut -d= -f2- | tr -d '\"')" \
-  npm run migrate:create -- initial
-
-git add src/migrations && git commit -m "Add initial Postgres migration"
+POSTGRES_URL="postgres://placeholder@127.0.0.1:5432/db" \
+  npm run migrate:create -- <name>
+git add src/migrations && git commit -m "Add migration"
 ```
+
+دیتابیس زنده لازم نیست — اسکیما از روی کانفیگ Payload ساخته می‌شود، پس هر
+connection string جعلی هم کار می‌کند. کافی است `POSTGRES_URL` ست باشد تا
+آداپتر Postgres انتخاب شود (نه SQLite)، وگرنه migration اشتباهی تولید می‌شود.
+
+قابل رد کردن نیست: `npm run migrate` روی پوشه خالی با کد خروج صفر رد می‌شود،
+پس `scripts/preflight.mjs` قبل از بیلد جلویش را می‌گیرد — وگرنه بیلد بعداً با
+خطای نامربوط می‌شکست.
 
 ### مرحله ۵ — پر کردن دیتابیس
 

@@ -58,9 +58,11 @@ if (databaseUrl) {
       "Deploying to Postgres with no migration files.",
       "  Payload only creates the schema automatically when NODE_ENV is not",
       "  'production', so this build would run against empty tables.",
-      "  Generate them once, from a machine that can reach the database:",
-      '    POSTGRES_URL="<connection string>" npm run migrate:create -- initial',
-      "    git add src/migrations && git commit -m 'Add initial Postgres migration'",
+      "  Generate and commit them (no live database needed — the schema comes",
+      "  from the Payload config, so any placeholder URL works):",
+      '    POSTGRES_URL="postgres://placeholder@127.0.0.1:5432/db" \\',
+      "      npm run migrate:create -- initial",
+      "    git add src/migrations && git commit -m 'Add Postgres migration'",
     ]);
   }
 }
