@@ -6,13 +6,14 @@ import Link from "next/link";
 
 import { cartTotal, useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
+import { useHydrated } from "@/lib/useHydrated";
 
 export default function CartPage() {
   const items = useCart((s) => s.items);
-  const hydrated = useCart((s) => s.hydrated);
-  const setQty = useCart((s) => s.setQty);
+  const changeQty = useCart((s) => s.changeQty);
   const remove = useCart((s) => s.remove);
   const reduced = useReducedMotion();
+  const hydrated = useHydrated();
 
   if (!hydrated) {
     return (
@@ -85,7 +86,7 @@ export default function CartPage() {
                 <div className="flex items-center rounded-xl border border-black/10">
                   <motion.button
                     type="button"
-                    onClick={() => setQty(item.key, item.qty - 1)}
+                    onClick={() => changeQty(item.key, -1)}
                     whileTap={reduced ? undefined : { scale: 0.85 }}
                     className="grid size-10 place-items-center transition-colors hover:text-brand-600"
                     aria-label="کاهش تعداد"
@@ -95,7 +96,7 @@ export default function CartPage() {
                   <span className="nums w-10 text-center font-bold">{formatPrice(item.qty)}</span>
                   <motion.button
                     type="button"
-                    onClick={() => setQty(item.key, item.qty + 1)}
+                    onClick={() => changeQty(item.key, 1)}
                     whileTap={reduced ? undefined : { scale: 0.85 }}
                     className="grid size-10 place-items-center transition-colors hover:text-brand-600"
                     aria-label="افزایش تعداد"

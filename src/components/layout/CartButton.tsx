@@ -5,12 +5,13 @@ import Link from "next/link";
 
 import { cartCount, useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
+import { useHydrated } from "@/lib/useHydrated";
 
 const MotionLink = motion.create(Link);
 
 export function CartButton() {
   const items = useCart((s) => s.items);
-  const hydrated = useCart((s) => s.hydrated);
+  const hydrated = useHydrated();
   const reduced = useReducedMotion();
   const count = cartCount(items);
 
