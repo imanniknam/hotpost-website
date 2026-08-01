@@ -52,3 +52,6 @@ next-env.d.ts
 
 # Payload generates these from the config; regenerate with:
 #   npm run generate:types && npm run generate:importmap
+
+.vercel
+.env*.local
