@@ -133,54 +133,69 @@ npm install @payloadcms/db-postgres
 انتخاب آداپتر و استوریج در `src/payload.config.ts` بر اساس وجود متغیر محیطی
 انجام می‌شود، پس هیچ سوییچ دستی لازم نیست.
 
-### مرحله ۱ — دیتابیس و استوریج
+**ترتیب مراحل مهم است.** یک وابستگی حلقوی وجود دارد: بیلد به migration نیاز
+دارد، ساخت migration به دیتابیس زنده نیاز دارد، و دیتابیس فقط بعد از ساخته شدن
+پروژه در Vercel قابل ایجاد است. `vercel link` این حلقه را باز می‌کند چون پروژه
+را بدون دیپلوی می‌سازد. اگر مستقیم `vercel --prod` بزنید، بیلد اول شکست می‌خورد.
 
-در داشبورد Vercel، به پروژه یک **Postgres** و یک **Blob store** وصل کنید
-(Storage → Create). Vercel خودش `POSTGRES_URL` و `BLOB_READ_WRITE_TOKEN` را
-تزریق می‌کند. اگر Neon جدا می‌سازید، connection string پول‌شده را دستی در
-Environment Variables بگذارید.
+### مرحله ۱ — ساخت پروژه بدون دیپلوی
 
-### مرحله ۲ — متغیرهای محیطی
+```bash
+npx vercel login
+npx vercel link
+```
 
-در Settings → Environment Variables این دو را اضافه کنید:
+### مرحله ۲ — دیتابیس و استوریج
+
+در داشبورد Vercel → Storage، به همین پروژه یک **Postgres** و یک **Blob store**
+وصل کنید. Vercel خودش `POSTGRES_URL` و `BLOB_READ_WRITE_TOKEN` را تزریق می‌کند.
+اگر Neon جدا می‌سازید، connection string پول‌شده را دستی در Environment
+Variables بگذارید.
+
+### مرحله ۳ — دو متغیر دیگر
+
+Settings → Environment Variables:
 
 ```
 PAYLOAD_SECRET        یک رشته تصادفی جدید (با رشته لوکال یکی نباشد)
 NEXT_PUBLIC_SITE_URL  https://<your-project>.vercel.app
 ```
 
-### مرحله ۳ — ساخت migration (یک‌بار، از روی سیستم خودتان)
+### مرحله ۴ — ساخت migration (یک‌بار)
 
-این مرحله قابل رد کردن نیست. بدون فایل‌های migration، بیلد روی Vercel یک
-دیتابیس بدون جدول می‌بیند و شکست می‌خورد.
+قابل رد کردن نیست. `npm run migrate` روی پوشه خالی با کد خروج صفر رد می‌شود،
+پس `scripts/preflight.mjs` قبل از بیلد جلویش را می‌گیرد و پیام واضح می‌دهد —
+وگرنه بیلد بعداً با خطای نامربوط می‌شکست.
 
 ```bash
-# connection string همان Postgres پروداکشن
-POSTGRES_URL="postgres://..." npx payload migrate:create initial
+npx vercel env pull .env.production.local   # connection string را می‌آورد
+POSTGRES_URL="$(grep '^POSTGRES_URL' .env.production.local | cut -d= -f2- | tr -d '\"')" \
+  npm run migrate:create -- initial
+
 git add src/migrations && git commit -m "Add initial Postgres migration"
 ```
 
-`vercel.json` دستور بیلد را `payload migrate && next build` گذاشته، پس
-migrationها موقع هر دیپلوی اجرا می‌شوند.
+### مرحله ۵ — پر کردن دیتابیس
 
-### مرحله ۴ — دیپلوی و پر کردن محتوا
-
-```bash
-vercel --prod
-```
-
-بعد از اولین دیپلوی، دیتابیس خالی است. محتوا را از روی سیستم خودتان پر کنید:
+قبل از دیپلوی انجامش دهید تا صفحات با محتوا پیش‌رندر شوند:
 
 ```bash
-POSTGRES_URL="postgres://..." npm run seed
-POSTGRES_URL="postgres://..." npm run create:admin -- <email> <password> "مدیر"
+export POSTGRES_URL="postgres://..."
+npm run migrate                                  # ساخت جداول
+npm run seed                                     # محتوای اسناد تیم محتوا
+npm run create:admin -- <email> <password> "مدیر"
+
+BLOB_READ_WRITE_TOKEN="vercel_blob_..." npm run import:assets
 ```
 
-سپس یک دیپلوی مجدد بزنید تا صفحات با محتوا پیش‌رندر شوند (`npm run seed` از
-CLI اجرا می‌شود و کش سرور در حال اجرا را پاک نمی‌کند — بخش «کش» را ببینید).
+### مرحله ۶ — دیپلوی
 
-تصاویر برند با `npm run import:assets` وارد می‌شوند؛ روی پروداکشن به Blob
-می‌روند چون توکن ست است.
+```bash
+npx vercel --prod
+```
+
+اگر بعداً محتوا را از CLI عوض کردید (نه از پنل ادمین)، یک دیپلوی مجدد لازم است:
+اسکریپت‌های CLI کش سرور در حال اجرا را پاک نمی‌کنند — بخش «کش» را ببینید.
 
 ## استقرار روی هاست ایرانی (پروداکشن نهایی)
 
