@@ -103,6 +103,38 @@
     color: transparent;
   }
 
+  /* FAQ accordion panel.
+     The collapsed size is CSS, not JS. A JS-driven resting state needs a frame
+     to apply, which showed every answer at full height on first paint before
+     snapping shut — and left them all open entirely if rAF never ran. The
+     grid-rows technique animates to intrinsic height with no measurement.
+     `[data-collapsible]` is only present after hydration, so the no-JS
+     `<details>` still expands to the full answer. */
+  .faq-panel > * {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .faq-panel[data-collapsible] {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 340ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 220ms ease-out;
+  }
+
+  .faq-panel[data-collapsible][data-expanded="true"] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq-panel[data-collapsible] {
+      transition-duration: 1ms;
+    }
+  }
+
   /* 1px gradient border via two stacked backgrounds; avoids animating box-shadow. */
   .ring-brand-gradient {
     border: 1px solid transparent;
