@@ -43,6 +43,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full`}>
+      <head>
+        {/*
+          Scroll reveals ship `opacity:0` in the server HTML and rely on JS to
+          clear it. If scripting is unavailable the whole page would read as
+          blank, so force everything visible in that case.
+        */}
+        <noscript>
+          <style>{`[style*="opacity:0"],[style*="opacity: 0"]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+      </head>
       <body className="flex min-h-full flex-col font-sans antialiased">
         <Header />
         <main className="flex-1">{children}</main>

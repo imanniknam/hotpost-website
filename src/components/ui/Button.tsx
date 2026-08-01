@@ -1,13 +1,12 @@
-import Link from "next/link";
-
+import { PressableButton, PressableLink } from "@/components/motion/Pressable";
 import { cn } from "@/lib/cn";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
 
 const variants = {
-  primary: "bg-brand-500 text-white hover:bg-brand-600",
-  outline: "border border-brand-200 text-brand-700 hover:bg-brand-50",
+  primary: "bg-brand-gradient text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40",
+  outline: "ring-brand-gradient text-brand-700 hover:text-brand-800",
   ghost: "text-ink-700 hover:bg-surface-muted",
 } as const;
 
@@ -25,9 +24,9 @@ export function ButtonLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link href={href} className={cn(base, variants[variant], className)}>
+    <PressableLink href={href} className={cn(base, variants[variant], className)}>
       {children}
-    </Link>
+    </PressableLink>
   );
 }
 
@@ -36,5 +35,5 @@ export function Button({
   className,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
-  return <button className={cn(base, variants[variant], className)} {...props} />;
+  return <PressableButton className={cn(base, variants[variant], className)} {...props} />;
 }

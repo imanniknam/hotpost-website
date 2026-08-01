@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { getCategoryBySlug, getCategoryTree, getProductsByCategory } from "@/lib/queries";
 
@@ -63,8 +65,10 @@ export default async function CategoryPage({ params }: Params) {
           <span className="text-ink-900">{category.title}</span>
         </nav>
 
-        <h1 className="text-3xl font-extrabold sm:text-4xl">{category.title}</h1>
-        {category.description && <p className="mt-3 text-ink-500">{category.description}</p>}
+        <Reveal y={0}>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{category.title}</h1>
+          {category.description && <p className="mt-3 text-ink-500">{category.description}</p>}
+        </Reveal>
       </section>
 
       {group && group.children.length > 0 && (
@@ -74,7 +78,7 @@ export default async function CategoryPage({ params }: Params) {
               <li key={child.id}>
                 <Link
                   href={`/shop/${child.slug}`}
-                  className="inline-block rounded-full bg-surface-muted px-4 py-2 text-sm font-medium transition hover:bg-brand-50 hover:text-brand-700"
+                  className="inline-block rounded-full bg-surface-muted px-4 py-2 text-sm font-medium ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-gradient hover:text-white hover:shadow-md hover:shadow-brand-500/25"
                 >
                   {child.title}
                 </Link>
@@ -86,15 +90,19 @@ export default async function CategoryPage({ params }: Params) {
 
       <section className="container-hp mt-10">
         {products.docs.length === 0 ? (
-          <p className="rounded-2xl bg-surface-muted p-10 text-center text-ink-500">
-            هنوز محصولی در این دسته‌بندی ثبت نشده است.
-          </p>
+          <Reveal>
+            <p className="bg-brand-gradient-soft rounded-2xl p-10 text-center text-ink-500 ring-1 ring-black/5">
+              هنوز محصولی در این دسته‌بندی ثبت نشده است.
+            </p>
+          </Reveal>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <StaggerGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" stagger={0.06}>
             {products.docs.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <StaggerItem key={product.id} className="h-full">
+                <ProductCard product={product} />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
         )}
       </section>
     </>

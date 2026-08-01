@@ -4,11 +4,18 @@ import type { SiteSetting } from "@/payload-types";
 
 export function Footer({ settings }: { settings: SiteSetting }) {
   return (
-    <footer className="mt-24 border-t border-black/5 bg-surface-muted">
+    <footer className="bg-surface-gradient relative mt-24 border-t border-black/5">
+      {/* Hairline brand rule across the top edge. */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-linear-to-l from-transparent via-brand-400 to-transparent"
+      />
       <div className="container-hp grid gap-10 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="mb-4 flex items-center gap-2 text-lg font-extrabold">
-            <span className="grid size-9 place-items-center rounded-xl bg-brand-500 text-white">هـ</span>
+            <span className="bg-brand-gradient grid size-9 place-items-center rounded-xl text-white shadow-md shadow-brand-500/30">
+              هـ
+            </span>
             <span>هات پست</span>
           </div>
           <p className="max-w-prose text-sm leading-8 text-ink-500">{settings.footerText}</p>

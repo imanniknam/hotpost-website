@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,6 +12,7 @@ export default function CartPage() {
   const hydrated = useCart((s) => s.hydrated);
   const setQty = useCart((s) => s.setQty);
   const remove = useCart((s) => s.remove);
+  const reduced = useReducedMotion();
 
   if (!hydrated) {
     return (
@@ -43,70 +45,87 @@ export default function CartPage() {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         <ul className="space-y-4 lg:col-span-2">
-          {items.map((item) => (
-            <li
-              key={item.key}
-              className="flex flex-wrap items-center gap-4 rounded-2xl border border-black/5 bg-white p-4"
-            >
-              <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-surface-muted">
-                {item.image && (
-                  <Image src={item.image} alt={item.title} fill sizes="80px" className="object-contain p-2" />
-                )}
-              </div>
-
-              <div className="min-w-40 flex-1">
-                <Link href={`/shop/product/${item.slug}`} className="font-bold hover:text-brand-600">
-                  {item.title}
-                </Link>
-                {item.variantLabel && (
-                  <p className="mt-1 text-xs text-ink-500">{item.variantLabel}</p>
-                )}
-                <p className="nums mt-1 text-sm text-brand-600">
-                  {formatPrice(item.price)} تومان
-                </p>
-              </div>
-
-              <div className="flex items-center rounded-xl border border-black/10">
-                <button
-                  type="button"
-                  onClick={() => setQty(item.key, item.qty - 1)}
-                  className="grid size-10 place-items-center"
-                  aria-label="کاهش تعداد"
-                >
-                  −
-                </button>
-                <span className="nums w-10 text-center font-bold">{formatPrice(item.qty)}</span>
-                <button
-                  type="button"
-                  onClick={() => setQty(item.key, item.qty + 1)}
-                  className="grid size-10 place-items-center"
-                  aria-label="افزایش تعداد"
-                >
-                  +
-                </button>
-              </div>
-
-              <div className="nums w-28 text-end font-extrabold">
-                {formatPrice(item.price * item.qty)}
-                <span className="ms-1 text-xs font-medium text-ink-500">تومان</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => remove(item.key)}
-                className="text-sm text-ink-500 transition hover:text-red-600"
+          <AnimatePresence initial={false}>
+            {items.map((item) => (
+              <motion.li
+                key={item.key}
+                layout={!reduced}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                // Collapsing height on exit stops the list from snapping shut.
+                exit={
+                  reduced
+                    ? { opacity: 0 }
+                    : { opacity: 0, x: 40, height: 0, marginBottom: 0, transition: { duration: 0.22 } }
+                }
+                transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                className="flex flex-wrap items-center gap-4 overflow-hidden rounded-2xl border border-black/5 bg-white p-4 shadow-sm"
               >
-                حذف
-              </button>
-            </li>
-          ))}
+                <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-linear-to-br from-surface-muted to-brand-50/60">
+                  {item.image && (
+                    <Image src={item.image} alt={item.title} fill sizes="80px" className="object-contain p-2" />
+                  )}
+                </div>
+
+                <div className="min-w-40 flex-1">
+                  <Link
+                    href={`/shop/product/${item.slug}`}
+                    className="font-bold transition-colors hover:text-brand-600"
+                  >
+                    {item.title}
+                  </Link>
+                  {item.variantLabel && (
+                    <p className="mt-1 text-xs text-ink-500">{item.variantLabel}</p>
+                  )}
+                  <p className="nums mt-1 text-sm text-brand-600">
+                    {formatPrice(item.price)} تومان
+                  </p>
+                </div>
+
+                <div className="flex items-center rounded-xl border border-black/10">
+                  <motion.button
+                    type="button"
+                    onClick={() => setQty(item.key, item.qty - 1)}
+                    whileTap={reduced ? undefined : { scale: 0.85 }}
+                    className="grid size-10 place-items-center transition-colors hover:text-brand-600"
+                    aria-label="کاهش تعداد"
+                  >
+                    −
+                  </motion.button>
+                  <span className="nums w-10 text-center font-bold">{formatPrice(item.qty)}</span>
+                  <motion.button
+                    type="button"
+                    onClick={() => setQty(item.key, item.qty + 1)}
+                    whileTap={reduced ? undefined : { scale: 0.85 }}
+                    className="grid size-10 place-items-center transition-colors hover:text-brand-600"
+                    aria-label="افزایش تعداد"
+                  >
+                    +
+                  </motion.button>
+                </div>
+
+                <div className="nums w-28 text-end font-extrabold">
+                  {formatPrice(item.price * item.qty)}
+                  <span className="ms-1 text-xs font-medium text-ink-500">تومان</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => remove(item.key)}
+                  className="text-sm text-ink-500 transition-colors hover:text-red-600"
+                >
+                  حذف
+                </button>
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </ul>
 
-        <aside className="h-fit rounded-2xl border border-black/5 bg-surface-muted p-6">
+        <aside className="bg-surface-gradient h-fit rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
           <h2 className="mb-4 font-bold">خلاصه سفارش</h2>
           <div className="nums flex justify-between border-t border-black/5 pt-4 text-lg font-extrabold">
             <span>مبلغ کل</span>
-            <span className="text-brand-600">
+            <span className="text-brand-gradient">
               {formatPrice(total)}
               <span className="ms-1 text-xs font-medium text-ink-500">تومان</span>
             </span>

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 
+import { HoverLift } from "@/components/motion/HoverLift";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { getSiteSettings } from "@/lib/queries";
 
 export const metadata: Metadata = {
@@ -13,39 +16,53 @@ export default async function ContactPage() {
   return (
     <>
       <section className="container-hp pt-10">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">تماس با ما</h1>
-        <p className="mt-4 text-lg text-ink-500">
-          {settings.supportHeading} {settings.supportSubheading}
-        </p>
+        <Reveal y={0}>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">تماس با ما</h1>
+          <p className="mt-4 text-lg text-ink-500">
+            {settings.supportHeading} {settings.supportSubheading}
+          </p>
+        </Reveal>
       </section>
 
-      <section className="container-hp mt-10 grid gap-5 sm:grid-cols-3">
-        <div className="rounded-2xl border border-black/5 bg-white p-6">
-          <h2 className="mb-4 font-bold">شماره تماس</h2>
-          <ul className="space-y-2">
-            {settings.phones?.map((phone) => (
-              <li key={phone.id ?? phone.dial}>
-                <a
-                  href={`tel:${phone.dial}`}
-                  className="nums text-lg font-bold text-brand-600 hover:underline"
-                >
-                  {phone.display}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <StaggerGroup as="div" className="container-hp mt-10 grid gap-5 sm:grid-cols-3">
+        <StaggerItem className="h-full">
+          <HoverLift className="h-full">
+            <div className="bg-brand-gradient-soft h-full rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+              <h2 className="mb-4 font-bold">شماره تماس</h2>
+              <ul className="space-y-2">
+                {settings.phones?.map((phone) => (
+                  <li key={phone.id ?? phone.dial}>
+                    <a
+                      href={`tel:${phone.dial}`}
+                      className="nums text-brand-gradient text-lg font-bold hover:underline"
+                    >
+                      {phone.display}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </HoverLift>
+        </StaggerItem>
 
-        <div className="rounded-2xl border border-black/5 bg-white p-6">
-          <h2 className="mb-4 font-bold">روز و ساعت پاسخگویی</h2>
-          <p className="leading-8 text-ink-500">{settings.hours}</p>
-        </div>
+        <StaggerItem className="h-full">
+          <HoverLift className="h-full">
+            <div className="h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <h2 className="mb-4 font-bold">روز و ساعت پاسخگویی</h2>
+              <p className="leading-8 text-ink-500">{settings.hours}</p>
+            </div>
+          </HoverLift>
+        </StaggerItem>
 
-        <div className="rounded-2xl border border-black/5 bg-white p-6">
-          <h2 className="mb-4 font-bold">آدرس</h2>
-          <p className="leading-8 text-ink-500">{settings.address}</p>
-        </div>
-      </section>
+        <StaggerItem className="h-full">
+          <HoverLift className="h-full">
+            <div className="h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <h2 className="mb-4 font-bold">آدرس</h2>
+              <p className="leading-8 text-ink-500">{settings.address}</p>
+            </div>
+          </HoverLift>
+        </StaggerItem>
+      </StaggerGroup>
     </>
   );
 }

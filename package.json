@@ -22,6 +22,7 @@
     "@payloadcms/richtext-lexical": "^3.87.0",
     "clsx": "^2.1.1",
     "graphql": "^16.14.2",
+    "motion": "^12.43.0",
     "next": "16.2.12",
     "payload": "^3.87.0",
     "react": "19.2.4",

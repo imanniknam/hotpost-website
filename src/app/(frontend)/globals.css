@@ -53,4 +53,57 @@
     padding-inline: 1rem;
     max-width: 80rem;
   }
+
+  /* Brand gradient. Angled to 135deg so it reads the same in RTL as LTR —
+     `to left` would flip meaning against the document direction. */
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-400) 0%,
+      var(--color-brand-500) 45%,
+      var(--color-brand-600) 100%
+    );
+  }
+
+  .bg-brand-gradient-soft {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-50) 0%,
+      #fff 55%,
+      var(--color-brand-100) 100%
+    );
+  }
+
+  .bg-ink-gradient {
+    background-image: linear-gradient(135deg, #1f2b3d 0%, var(--color-ink-900) 55%, #0d141f 100%);
+  }
+
+  /* Warm wash behind hero/feature panels. */
+  .bg-surface-gradient {
+    background-image:
+      radial-gradient(60rem 30rem at 85% -10%, var(--color-brand-100) 0%, transparent 60%),
+      radial-gradient(45rem 25rem at 0% 110%, #eef2f7 0%, transparent 65%),
+      linear-gradient(180deg, var(--color-surface-muted) 0%, #fff 100%);
+  }
+
+  .text-brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-500) 0%,
+      var(--color-brand-700) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 1px gradient border via two stacked backgrounds; avoids animating box-shadow. */
+  .ring-brand-gradient {
+    border: 1px solid transparent;
+    background-image:
+      linear-gradient(#fff, #fff),
+      linear-gradient(135deg, var(--color-brand-200), var(--color-brand-400));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
 }

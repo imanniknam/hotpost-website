@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { HoverLift } from "@/components/motion/HoverLift";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { FaqJsonLd, FaqList } from "@/components/ui/Faq";
@@ -32,8 +35,8 @@ export default async function HomePage() {
 
       {/* Hero */}
       <section className="container-hp pt-10">
-        <div className="grid items-center gap-10 rounded-3xl bg-surface-muted p-8 sm:p-12 md:grid-cols-2">
-          <div>
+        <div className="bg-surface-gradient grid items-center gap-10 overflow-hidden rounded-3xl p-8 ring-1 ring-black/5 sm:p-12 md:grid-cols-2">
+          <Reveal y={0}>
             <p className="mb-3 font-bold text-brand-600">{home.eyebrow}</p>
             <h1 className="text-3xl font-extrabold leading-[1.5] sm:text-4xl sm:leading-[1.4]">
               {home.heading}
@@ -46,116 +49,149 @@ export default async function HomePage() {
                 تماس با ما
               </ButtonLink>
             </div>
-          </div>
+          </Reveal>
 
           <div className="grid gap-4">
             {heroImage?.url && (
-              <Image
-                src={heroImage.url}
-                alt={heroImage.alt}
-                width={640}
-                height={420}
-                priority
-                className="rounded-2xl object-cover"
-              />
+              <Reveal delay={0.1} scale>
+                <Image
+                  src={heroImage.url}
+                  alt={heroImage.alt}
+                  width={640}
+                  height={420}
+                  priority
+                  className="rounded-2xl object-cover"
+                />
+              </Reveal>
             )}
 
-            <dl className="grid grid-cols-3 gap-3">
+            <StaggerGroup as="dl" className="grid grid-cols-3 gap-3" stagger={0.1}>
               {home.stats?.map((stat) => (
-                // Reversed so the value reads above the label while keeping dt before dd.
-                <div
-                  key={stat.id ?? stat.label}
-                  className="flex flex-col-reverse rounded-2xl bg-white p-4 text-center"
-                >
-                  <dt className="mt-1 text-xs text-ink-500">{stat.label}</dt>
-                  <dd className="nums text-2xl font-extrabold text-brand-600">{stat.value}</dd>
-                </div>
+                <StaggerItem key={stat.id ?? stat.label}>
+                  {/* Reversed so the value reads above the label while keeping dt before dd. */}
+                  <div className="flex h-full flex-col-reverse rounded-2xl bg-white/80 p-4 text-center shadow-sm ring-1 ring-black/5 backdrop-blur">
+                    <dt className="mt-1 text-xs text-ink-500">{stat.label}</dt>
+                    <dd className="nums text-brand-gradient text-2xl font-extrabold">
+                      {stat.value}
+                    </dd>
+                  </div>
+                </StaggerItem>
               ))}
-            </dl>
+            </StaggerGroup>
           </div>
         </div>
       </section>
 
       {/* Services */}
       <section className="container-hp mt-24">
-        <SectionHeading
-          title="خدمات اصلی هات پست"
-          subtitle="چهار مدل خدماتی، متناسب با هر کسب‌وکار"
-          href="/services"
-          hrefLabel="مشاهده خدمات"
-        />
+        <Reveal>
+          <SectionHeading
+            title="خدمات اصلی هات پست"
+            subtitle="چهار مدل خدماتی، متناسب با هر کسب‌وکار"
+            href="/services"
+            hrefLabel="مشاهده خدمات"
+          />
+        </Reveal>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service) => (
-            <Link
-              key={service.id}
-              href={`/services#${service.slug}`}
-              className="group rounded-2xl border border-black/5 bg-white p-6 transition hover:border-brand-200 hover:shadow-lg"
-            >
-              <h3 className="text-lg font-extrabold group-hover:text-brand-600">{service.title}</h3>
-              {service.englishTitle && (
-                <p className="mt-1 text-xs font-medium text-brand-500">{service.englishTitle}</p>
-              )}
-              <p className="mt-3 text-sm leading-7 text-ink-500">{service.tagline}</p>
-            </Link>
+            <StaggerItem key={service.id} className="h-full">
+              <HoverLift className="h-full">
+                <Link
+                  href={`/services#${service.slug}`}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-brand-500/10"
+                >
+                  {/* Gradient wash that fades in behind the card content on hover. */}
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 bg-linear-to-br from-brand-50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+                  <span className="relative">
+                    <h3 className="text-lg font-extrabold transition-colors group-hover:text-brand-600">
+                      {service.title}
+                    </h3>
+                    {service.englishTitle && (
+                      <span className="mt-1 block text-xs font-medium text-brand-500">
+                        {service.englishTitle}
+                      </span>
+                    )}
+                    <span className="mt-3 block text-sm leading-7 text-ink-500">
+                      {service.tagline}
+                    </span>
+                  </span>
+                </Link>
+              </HoverLift>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </section>
 
       {/* Shop */}
       {products.length > 0 && (
         <section className="container-hp mt-24">
-          <SectionHeading
-            title="اقلام فروشگاه هات پست"
-            subtitle="ملزومات بسته‌بندی، ارسال و تجهیزات چاپ"
-            href="/shop"
-          />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <Reveal>
+            <SectionHeading
+              title="اقلام فروشگاه هات پست"
+              subtitle="ملزومات بسته‌بندی، ارسال و تجهیزات چاپ"
+              href="/shop"
+            />
+          </Reveal>
+          <StaggerGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" stagger={0.06}>
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <StaggerItem key={product.id} className="h-full">
+                <ProductCard product={product} />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
         </section>
       )}
 
       {/* About */}
       <section className="container-hp mt-24">
-        <div className="grid items-center gap-10 rounded-3xl bg-surface-muted p-8 sm:p-12 md:grid-cols-2">
-          {aboutImage?.url && (
-            <Image
-              src={aboutImage.url}
-              alt={aboutImage.alt}
-              width={640}
-              height={480}
-              className="rounded-2xl object-cover"
-            />
-          )}
-          <div className={aboutImage?.url ? "" : "md:col-span-2"}>
-            <h2 className="text-2xl font-extrabold sm:text-3xl">{home.aboutHeading}</h2>
-            <p className="mt-4 leading-9 text-ink-700">{home.aboutSummary}</p>
-            <ButtonLink href="/about" className="mt-8">
-              درباره ما ←
-            </ButtonLink>
+        <Reveal scale>
+          <div className="bg-surface-gradient grid items-center gap-10 rounded-3xl p-8 ring-1 ring-black/5 sm:p-12 md:grid-cols-2">
+            {aboutImage?.url && (
+              <Image
+                src={aboutImage.url}
+                alt={aboutImage.alt}
+                width={640}
+                height={480}
+                className="rounded-2xl object-cover"
+              />
+            )}
+            <div className={aboutImage?.url ? "" : "md:col-span-2"}>
+              <h2 className="text-2xl font-extrabold sm:text-3xl">{home.aboutHeading}</h2>
+              <p className="mt-4 leading-9 text-ink-700">{home.aboutSummary}</p>
+              <ButtonLink href="/about" className="mt-8">
+                درباره ما ←
+              </ButtonLink>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* FAQ */}
       {faqs.length > 0 && (
         <section className="container-hp mt-24">
-          <SectionHeading title="پرسش‌های متداول" className="justify-center text-center" />
-          <FaqList faqs={faqs} />
+          <Reveal>
+            <SectionHeading title="پرسش‌های متداول" className="justify-center text-center" />
+            <FaqList faqs={faqs} />
+          </Reveal>
         </section>
       )}
 
       {/* Support */}
       <section className="mt-24">
-        <SupportBanner settings={settings} />
+        <Reveal scale>
+          <SupportBanner settings={settings} />
+        </Reveal>
       </section>
 
       {/* Closing */}
       <section className="container-hp mt-16">
-        <p className="mx-auto max-w-4xl text-center leading-9 text-ink-500">{home.closingText}</p>
+        <Reveal>
+          <p className="mx-auto max-w-4xl text-center leading-9 text-ink-500">{home.closingText}</p>
+        </Reveal>
       </section>
     </>
   );

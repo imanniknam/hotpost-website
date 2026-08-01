@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 
 import { useCart } from "@/lib/cart";
@@ -10,6 +11,7 @@ import type { Product } from "@/payload-types";
 export function ProductPurchase({ product }: { product: Product }) {
   const variants = product.variants ?? [];
   const add = useCart((s) => s.add);
+  const reduced = useReducedMotion();
 
   const [variantIndex, setVariantIndex] = useState(variants.length ? 0 : -1);
   const [qty, setQty] = useState(1);
@@ -44,21 +46,24 @@ export function ProductPurchase({ product }: { product: Product }) {
           <legend className="mb-3 font-bold">انتخاب تنوع</legend>
           <div className="flex flex-wrap gap-2">
             {variants.map((v, index) => (
-              <button
+              <motion.button
                 key={v.id ?? v.label}
                 type="button"
                 onClick={() => setVariantIndex(index)}
                 aria-pressed={index === variantIndex}
+                whileHover={reduced ? undefined : { scale: 1.05 }}
+                whileTap={reduced ? undefined : { scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 className={cn(
-                  "rounded-xl border px-4 py-2 text-sm font-medium transition",
+                  "rounded-xl border px-4 py-2 text-sm font-medium transition-colors",
                   index === variantIndex
-                    ? "border-brand-500 bg-brand-50 text-brand-700"
-                    : "border-black/10 hover:border-brand-200",
+                    ? "border-transparent bg-brand-gradient text-white shadow-md shadow-brand-500/25"
+                    : "border-black/10 hover:border-brand-300",
                   (v.stock ?? 0) <= 0 && "opacity-50",
                 )}
               >
                 {v.label}
-              </button>
+              </motion.button>
             ))}
           </div>
         </fieldset>
@@ -68,7 +73,16 @@ export function ProductPurchase({ product }: { product: Product }) {
         {product.compareAtPrice && product.compareAtPrice > price && (
           <span className="text-ink-500 line-through">{formatPrice(product.compareAtPrice)}</span>
         )}
-        <span className="text-3xl font-extrabold text-brand-600">{formatPrice(price)}</span>
+        <motion.span
+          // Keyed on price so switching variant animates the number swap.
+          key={price}
+          className="text-brand-gradient text-3xl font-extrabold"
+          initial={reduced ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {formatPrice(price)}
+        </motion.span>
         <span className="text-sm text-ink-500">تومان</span>
       </div>
 
@@ -93,21 +107,24 @@ export function ProductPurchase({ product }: { product: Product }) {
           </button>
         </div>
 
-        <button
+        <motion.button
           type="button"
           onClick={handleAdd}
           disabled={outOfStock}
+          whileHover={outOfStock || reduced ? undefined : { scale: 1.02 }}
+          whileTap={outOfStock || reduced ? undefined : { scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
           className={cn(
-            "flex-1 rounded-xl px-6 py-3 text-sm font-bold transition",
+            "flex-1 rounded-xl px-6 py-3 text-sm font-bold transition-colors",
             outOfStock
               ? "cursor-not-allowed bg-surface-muted text-ink-500"
               : added
-                ? "bg-emerald-600 text-white"
-                : "bg-brand-500 text-white hover:bg-brand-600",
+                ? "bg-linear-to-l from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/25"
+                : "bg-brand-gradient text-white shadow-md shadow-brand-500/30",
           )}
         >
           {outOfStock ? "ناموجود" : added ? "به سبد اضافه شد ✓" : "افزودن به سبد خرید"}
-        </button>
+        </motion.button>
       </div>
 
       <p className="text-sm text-ink-500">

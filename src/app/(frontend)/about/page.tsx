@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import Image from "next/image";
 
+import { Reveal } from "@/components/motion/Reveal";
 import { SupportBanner } from "@/components/ui/SupportBanner";
 import { getAboutPage, getSiteSettings } from "@/lib/queries";
 
@@ -19,7 +20,13 @@ export default async function AboutPage() {
   return (
     <>
       <section className="container-hp pt-10">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">{about.heading}</h1>
+        <Reveal y={0}>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{about.heading}</h1>
+          <span
+            aria-hidden="true"
+            className="mt-4 block h-1 w-24 rounded-full bg-linear-to-l from-brand-400 to-brand-600"
+          />
+        </Reveal>
       </section>
 
       <section className="container-hp mt-10 grid gap-10 md:grid-cols-5">
@@ -35,7 +42,7 @@ export default async function AboutPage() {
           </div>
         )}
 
-        <div
+        <Reveal
           className={
             image?.url
               ? "md:col-span-3 [&_p]:mb-5 [&_p]:leading-9 [&_p]:text-ink-700"
@@ -43,11 +50,13 @@ export default async function AboutPage() {
           }
         >
           <RichText data={about.body} />
-        </div>
+        </Reveal>
       </section>
 
       <section className="mt-24">
-        <SupportBanner settings={settings} />
+        <Reveal scale>
+          <SupportBanner settings={settings} />
+        </Reveal>
       </section>
     </>
   );

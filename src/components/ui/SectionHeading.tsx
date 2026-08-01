@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { PressableLink } from "@/components/motion/Pressable";
 import { cn } from "@/lib/cn";
 
 export function SectionHeading({
@@ -22,12 +21,12 @@ export function SectionHeading({
         {subtitle && <p className="mt-2 text-ink-500">{subtitle}</p>}
       </div>
       {href && (
-        <Link
+        <PressableLink
           href={href}
-          className="shrink-0 rounded-full border border-brand-200 px-4 py-2 text-sm font-medium text-brand-700 transition hover:bg-brand-50"
+          className="ring-brand-gradient shrink-0 rounded-full px-4 py-2 text-sm font-medium text-brand-700 transition-colors hover:text-brand-800"
         >
           {hrefLabel}
-        </Link>
+        </PressableLink>
       )}
     </div>
   );
