@@ -15,7 +15,8 @@
     "create:admin": "payload run src/scripts/create-admin.ts",
     "import:assets": "payload run src/scripts/import-wp-assets.ts",
     "migrate:create": "payload migrate:create",
-    "migrate": "payload migrate"
+    "migrate": "payload migrate",
+    "bootstrap": "payload run src/scripts/bootstrap.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.5.7",

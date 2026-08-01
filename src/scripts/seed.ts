@@ -1,150 +1,18 @@
 /**
- * Seeds the content that the client's content team supplied in the four docx
- * briefs. Safe to re-run: collections are cleared first, globals are upserted.
+ * Replaces all site content with what the content team supplied in the four
+ * docx briefs.
  *
  *   npm run seed
+ *
+ * DESTRUCTIVE — it empties the collections it owns first, so anything edited in
+ * the admin panel is lost. That is fine on a development machine, which is the
+ * only place this is meant to run. Deploys use `bootstrap.ts`, which only fills
+ * an empty database and never deletes.
  */
 import config from "@payload-config";
 import { getPayload } from "payload";
 
-import { paragraphs } from "./lexical";
-
-const CATEGORIES = [
-  {
-    root: { title: "هات پست پک", slug: "hotpost-pack", description: "ملزومات بسته‌بندی و ارسال" },
-    children: [
-      { title: "کارتن پستی", slug: "postal-carton" },
-      { title: "پاکت پستی", slug: "postal-envelope" },
-      { title: "چسب", slug: "tape" },
-      { title: "نخ", slug: "twine" },
-      { title: "لیبل", slug: "label" },
-      { title: "ریبون", slug: "ribbon" },
-      { title: "کاغذ آچار", slug: "wrapping-paper" },
-      { title: "گونی پلاستیکی", slug: "plastic-sack" },
-    ],
-  },
-  {
-    root: { title: "هات پست چاپ", slug: "hotpost-print", description: "تجهیزات چاپ و لیبل" },
-    children: [
-      { title: "کامپیوتر", slug: "computer" },
-      { title: "پرینتر", slug: "printer" },
-      { title: "کارتریج پرینتر", slug: "printer-cartridge" },
-      { title: "لیبل پرینتر", slug: "label-printer" },
-    ],
-  },
-];
-
-const SERVICES = [
-  {
-    title: "سرویس پس‌کرایه",
-    englishTitle: "PostPay",
-    slug: "postpay",
-    tagline: "هزینه پست از گیرنده دریافت می‌شود",
-    summary:
-      "در این مدل خدماتی، فرستنده مرسوله هیچ هزینه‌ای بابت پست پیش‌پرداخت نمی‌کند. تمام هزینه‌های پستی هنگام تحویل مرسوله از گیرنده دریافت می‌شود.",
-    benefits: [
-      "بدون نیاز به پرداخت پیش‌پرداخت برای فرستنده",
-      "مناسب برای کسب‌وکارهایی که حجم بالای مرسولات دارند",
-      "کاهش هزینه‌های جاری فروشگاه",
-    ],
-    bestFor: "کسب‌وکارهایی که نمی‌خواهند هزینه پست را از سرمایه در گردش خود پرداخت کنند.",
-    order: 1,
-  },
-  {
-    title: "تسویه درب منزل",
-    englishTitle: "Cash on Delivery",
-    slug: "cash-on-delivery",
-    tagline: "دریافت هزینه پست + قیمت محصول از گیرنده",
-    summary:
-      "در این روش، هم هزینه پست و هم هزینه خود محصول هنگام تحویل مرسوله، از گیرنده دریافت می‌شود. هات پست وجه وصول شده را پس از کسر کارمزد، به حساب شما واریز می‌کند.",
-    benefits: [
-      "فروش اینترنتی بدون نیاز به درگاه پرداخت آنلاین",
-      "افزایش اعتماد مشتری (پرداخت پس از دریافت کالا)",
-      "واریز منظم وجوه به حساب فروشنده",
-    ],
-    bestFor:
-      "فروشگاه‌های اینترنتی، تولیدکنندگان، کسب‌وکارهای کالامحور و افرادی که درگاه پرداخت آنلاین ندارند.",
-    order: 2,
-  },
-  {
-    title: "فول‌فیلمنت",
-    englishTitle: "Fulfillment",
-    slug: "fulfillment",
-    tagline: "همه چیز با هات پست! شما فقط سفارش بگیرید",
-    summary:
-      "در این مدل خدماتی، هات پست انبار لوجستیک در اختیار شما قرار می‌دهد. کالاهای شما در انبار ما نگهداری، بسته‌بندی و سپس ارسال می‌شود. شما فقط سفارشات مشتریان خود را اعلام می‌کنید، بقیه فرآیند بر عهده هات پست است.",
-    includes: [
-      "انبارداری امن و اصولی",
-      "بسته‌بندی حرفه‌ای متناسب با نوع کالا",
-      "ارسال سریع با بهترین اپراتورهای پستی",
-      "پیگیری سفارشات و ارسال کد رهگیری به مشتری نهایی",
-    ],
-    benefits: [
-      "حذف هزینه انبارداری برای شما",
-      "عدم نیاز به نیروی بسته‌بندی و پست",
-      "تمرکز کامل بر روی فروش و بازاریابی کسب‌وکارتان",
-    ],
-    bestFor:
-      "کسب‌وکارهای پرمحصول، فروشگاه‌های اینترنتی بدون انبار شخصی، برندهای در حال رشد و تولیدکنندگانی که قصد دارند فرآیند ارسال را به طور کامل برون‌سپاری کنند.",
-    order: 3,
-  },
-  {
-    title: "پیک اختصاصی",
-    englishTitle: "Same Day / Next Day",
-    slug: "courier",
-    tagline: "ارسال سریع با پیک در تهران، شهرستان‌های استان تهران و کل استان البرز",
-    summary:
-      "این خدمت برای مواقعی است که نیاز به ارسال فوق‌العاده سریع دارید و زمان برای شما حرف اول را می‌زند. هات پست با بهره‌گیری از ناوگان پیک اختصاصی، مرسولات شما را در محدوده جغرافیایی مشخص شده با دو مدل زمانی تحویل می‌دهد.",
-    coverage: [
-      "ارسال در همان روز کاری",
-      "ارسال در روز کاری بعد",
-      "شهر تهران",
-      "شهرستان‌های استان تهران",
-      "کل استان البرز",
-    ],
-    benefits: [
-      "فوق‌العاده سریع و قابل اعتماد",
-      "بدون نیاز به فرآیندهای اداری و زمان‌بر پست سنتی",
-      "مناسب برای اسناد مهم، کالاهای فاسدشدنی و مرسولات فوری",
-      "پشتیبانی و پیگیری لحظه‌ای",
-    ],
-    bestFor:
-      "مدارک فوری، کالاهای حساس به زمان، سفارشات اضطراری مشتریان، رستوران‌ها و کافی‌شاپ‌ها، داروخانه‌ها و هر کسب‌وکاری که تحویل سریع برایش حیاتی است.",
-    order: 4,
-  },
-];
-
-const FAQS = [
-  {
-    question: "هات پست چیست؟",
-    answer:
-      "یک مجموعه خدمات پستی هوشمند با ۳۰ سال تجربه که مرسولات را روزانه جمع‌آوری، کد رهگیری می‌فرستد و با اپراتورهای معتبری همچون تیپاکس، چاپار، پینکس، ماهکس و پست جمهوری اسلامی همکاری می‌کند.",
-    order: 1,
-  },
-  {
-    question: "مزیت رقابتی هات پست چیست؟",
-    answer: "سریعترین زمان ارسال مرسوله؛ هیچ رقیبی نمی‌تواند سریعتر از هات پست این کار را انجام دهد.",
-    order: 2,
-  },
-  {
-    question: "چگونه با هات پست می‌شود قرارداد بست؟",
-    answer:
-      "وارد سایت هات پست بشید، ثبت درخواست رو انجام بدید، چند کلیک کنید و اطلاعات رو وارد کنید.",
-    order: 3,
-  },
-  {
-    question: "مزایای استفاده از هات پست چیه؟",
-    answer:
-      "انعطاف در هزینه و خدمات، قرارداد آنلاین در چند کلیک و ارائه همزمان خدمات پستی و طراحی سایت حرفه‌ای.",
-    order: 4,
-  },
-  {
-    question: "هات پست خدمات طراحی سایت هم ارائه می‌دهد؟",
-    answer:
-      "بله، هات پست با بهره‌گیری از مجرب‌ترین طراحان سایت و به‌روزترین مهندسان انفورماتیک، خدمات طراحی سایت را ارائه می‌دهد.",
-    order: 5,
-  },
-];
+import { OWNED_COLLECTIONS, writeContent } from "./content";
 
 // Must be awaited at the top level: `payload run` exits once module evaluation
 // settles, so a floating promise here would be cut off before it does anything.
@@ -152,105 +20,10 @@ const FAQS = [
   const payload = await getPayload({ config });
 
   payload.logger.info("پاک کردن داده‌های قبلی…");
-  for (const collection of ["faqs", "services", "products", "product-categories"] as const) {
+  for (const collection of OWNED_COLLECTIONS) {
     await payload.delete({ collection, where: { id: { exists: true } } });
   }
 
-  payload.logger.info("ساخت دسته‌بندی‌ها…");
-  let order = 0;
-  for (const group of CATEGORIES) {
-    const root = await payload.create({
-      collection: "product-categories",
-      data: { ...group.root, order: order++ },
-    });
-    for (const child of group.children) {
-      await payload.create({
-        collection: "product-categories",
-        data: { ...child, parent: root.id, order: order++ },
-      });
-    }
-  }
-
-  payload.logger.info("ساخت خدمات…");
-  for (const service of SERVICES) {
-    const { benefits, includes, coverage, ...rest } = service;
-    await payload.create({
-      collection: "services",
-      data: {
-        ...rest,
-        benefits: benefits?.map((text) => ({ text })),
-        includes: includes?.map((text) => ({ text })),
-        coverage: coverage?.map((text) => ({ text })),
-      },
-    });
-  }
-
-  payload.logger.info("ساخت پرسش‌های متداول…");
-  for (const faq of FAQS) {
-    await payload.create({ collection: "faqs", data: faq });
-  }
-
-  payload.logger.info("تنظیمات سایت…");
-  await payload.updateGlobal({
-    slug: "site-settings",
-    data: {
-      phones: [
-        { display: "۰۲۱۵۵۰۲۶۰۹۹", dial: "02155026099" },
-        { display: "۰۲۱۵۵۰۰۰۸۷۵", dial: "02155000875" },
-      ],
-      hours: "شنبه تا چهارشنبه از ساعت ۸ تا ۱۶",
-      address: "تهران، اتوبان شهید رجایی، شهرک ۱۳ آبان، خیابان رحیمی، پلاک ۳۸",
-      supportHeading: "نیاز به پشتیبانی دارید؟",
-      supportSubheading: "آماده پاسخگویی هستیم...",
-      footerText:
-        "هات پست، باجه پستی کامل کسب‌وکار شماست. مرسولات را روزانه جمع‌آوری می‌کنیم، رسید الکترونیک مالی به همراه کد رهگیری می‌فرستیم و با معتبرترین اپراتورهای پستی کشور همکاری می‌کنیم.",
-      quickLinks: [
-        { label: "خدمات هات پست", href: "/services" },
-        { label: "فروشگاه", href: "/shop" },
-        { label: "درباره ما", href: "/about" },
-        { label: "تماس با ما", href: "/contact" },
-      ],
-      defaultTitle: "هات پست | خدمات پستی، فول‌فیلمنت و پیک اختصاصی",
-      defaultDescription:
-        "هات پست با ۳۰ سال تجربه مدیریتی، خدمات پس‌کرایه، تسویه درب منزل، فول‌فیلمنت و پیک اختصاصی را همراه با فروشگاه ملزومات بسته‌بندی ارائه می‌دهد.",
-    },
-  });
-
-  payload.logger.info("صفحه اصلی…");
-  await payload.updateGlobal({
-    slug: "home-page",
-    data: {
-      eyebrow: "هات پست",
-      heading: "هات پست؛ سریعترین ارسال با خدماتی متنوع",
-      subheading: "هات پست باجه پستی کامل کسب و کار شما...",
-      stats: [
-        { value: "۳۰+", label: "سال تجربه مدیریت" },
-        { value: "۹۸٪", label: "رضایت مشتریان" },
-        { value: "۱۰۰٪", label: "کیفیت خدمات" },
-      ],
-      aboutHeading: "درباره هات پست",
-      aboutSummary:
-        "هات پست حاصل ۳۰ سال تجربه مدیریتی در منطقه ۱۸ پستی و ۱۱ سال فعالیت در پیشخوان دولت است. ما مرسولات شما را روزانه جمع‌آوری، کد رهگیری می‌فرستیم و با اپراتورهای معتبری همچون تیپاکس، چاپار، پینکس، ماهکس و پست جمهوری اسلامی همکاری می‌کنیم. قرارداد آنلاین در چند کلیک، سریعترین زمان ارسال، طراحی سایت حرفه‌ای و اس ام اس رایگان برای فروشگاه‌های همکار، چیزی است که هات پست را از رقبا متمایز می‌کند.",
-      closingText:
-        "مجموعه هات پست با بهره‌مندی از بیش از ۳۰ سال تجربه مدیریتی در منطقه ۱۸ پستی و ۱۱ سال فعالیت مستمر در پیشخوان دولت، به عنوان یکی از چهره‌های شناخته شده در زمینه ارائه خدمات پستی و حمل‌ونقل بسته‌های مشتریان مطرح است. هات پست خدمات متنوعی به صاحبان کسب‌وکارهای خرد و کلان ارائه می‌دهد.",
-    },
-  });
-
-  payload.logger.info("صفحه درباره ما…");
-  await payload.updateGlobal({
-    slug: "about-page",
-    data: {
-      heading: "درباره ما",
-      body: paragraphs([
-        "هات پست حاصل بیش از ۳۰ سال تجربه مدیریتی پدر در جایگاه مدیرکل منطقه ۱۸ پستی و ۱۱ سال فعالیت مستمر در پیشخوان دولت است. مجموعه‌ای که اصالت خدمات سنتی پست را با فناوری‌های نوین پیوند زده است.",
-        "ما مرسولات پستی مشتریانی که با هات پست قرارداد دارند را روزانه جمع‌آوری می‌کنیم، فرآیند پستی را انجام داده و رسید الکترونیک مالی به همراه کد رهگیری برایشان ارسال می‌کنیم.",
-        "هات پست با اپراتورهای معتبر پستی همچون تیپاکس، چاپار، پینکس، ماهکس و پست جمهوری اسلامی همکاری داشته و خدمات خود را در چهار مدل ارائه می‌دهد: پس‌کرایه (هزینه پست با گیرنده)، COD (دریافت هزینه پست و محصول درب منزل گیرنده)، فول‌فیلمنت (انبارداری، بسته‌بندی و ارسال با هات پست) و پیک اختصاصی (ارسال same day و next day در تهران، شهرستان‌های استان تهران و کل استان البرز).",
-        "تمام این خدمات از طریق درگاه اینترنتی و با چند کلیک ساده قابل ثبت است؛ بدون نیاز به مراجعه حضوری. مزیت رقابتی هات پست سریعترین زمان ارسال مرسوله است. علاوه بر این، ما با انعطاف کامل در خدمات و هزینه‌ها متناسب با دلخواه مشتری، شرایط را برای رقبا سخت کرده‌ایم.",
-        "اس ام اس رایگان برای مشتریان فروشگاه‌های همکار یک هدیه ویژه است و خدمات طراحی سایت حرفه‌ای را نیز با بهره‌گیری از مجرب‌ترین طراحان و به‌روزترین مهندسان انفورماتیک به مجموعه خود اضافه کرده‌ایم.",
-      ]),
-    },
-  });
-
-  payload.logger.info("✅ محتوا با موفقیت وارد شد.");
+  await writeContent(payload);
   process.exit(0);
 }

@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node scripts/preflight.mjs && payload migrate && next build",
+  "buildCommand": "node scripts/preflight.mjs && payload migrate && payload run src/scripts/bootstrap.ts && next build",
   "framework": "nextjs"
 }
