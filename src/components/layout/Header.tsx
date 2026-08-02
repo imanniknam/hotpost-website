@@ -1,23 +1,22 @@
 import Link from "next/link";
 
+import { getSiteSettings } from "@/lib/queries";
+
 import { CartButton } from "./CartButton";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
+import { NAV_LINKS } from "./navLinks";
 
-export const NAV_LINKS = [
-  { href: "/", label: "خانه" },
-  { href: "/services", label: "خدمات" },
-  { href: "/shop", label: "فروشگاه" },
-  { href: "/about", label: "درباره ما" },
-  { href: "/contact", label: "تماس با ما" },
-];
+// getSiteSettings is wrapped in React's cache(), so the layout's own call for
+// the footer and this one dedupe into a single query per request.
+export async function Header() {
+  const settings = await getSiteSettings();
 
-export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-black/5 bg-white/80 backdrop-blur-xl">
-      <div className="container-hp flex h-16 items-center gap-4">
-        <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
-          <Logo className="h-9 w-auto" />
+      <div className="container-hp flex h-16 items-center gap-2 sm:gap-4">
+        <Link href="/" className="flex shrink-0 items-center transition-opacity hover:opacity-80">
+          <Logo className="h-8 w-auto sm:h-9" />
           <span className="sr-only">هات پست</span>
         </Link>
 
@@ -35,9 +34,29 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="ms-auto flex items-center gap-2 md:ms-0">
+        <div className="ms-auto flex items-center gap-1.5 sm:gap-2 md:ms-0">
+          {settings.customerPortalUrl && (
+            <a
+              href={settings.customerPortalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-1.5 rounded-full border border-brand-200 px-3 py-2 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50 sm:inline-flex"
+            >
+              <svg
+                className="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                aria-hidden="true"
+              >
+                <path d="M16 17l5-5-5-5M21 12H9M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" />
+              </svg>
+              ورود مشتریان
+            </a>
+          )}
           <CartButton />
-          <MobileNav />
+          <MobileNav customerPortalUrl={settings.customerPortalUrl} />
         </div>
       </div>
     </header>

@@ -755,6 +755,10 @@ export interface SiteSetting {
   address: string;
   supportHeading?: string | null;
   supportSubheading?: string | null;
+  /**
+   * پنل کاربری جداگانه مشتریان است، بیرون از این سایت. دکمه «ورود مشتریان» در هدر به همین آدرس می‌رود.
+   */
+  customerPortalUrl?: string | null;
   footerText: string;
   quickLinks?:
     | {
@@ -820,6 +824,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   address?: T;
   supportHeading?: T;
   supportSubheading?: T;
+  customerPortalUrl?: T;
   footerText?: T;
   quickLinks?:
     | T

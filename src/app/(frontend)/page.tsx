@@ -5,6 +5,7 @@ import { HoverLift } from "@/components/motion/HoverLift";
 import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { AboutIllustration } from "@/components/ui/AboutIllustration";
 import { ButtonLink } from "@/components/ui/Button";
 import { FaqJsonLd, FaqList } from "@/components/ui/Faq";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -159,7 +160,7 @@ export default async function HomePage() {
       <section className="container-hp mt-24">
         <Reveal scale>
           <div className="bg-surface-gradient grid items-center gap-10 rounded-3xl p-8 ring-1 ring-black/5 sm:p-12 md:grid-cols-2">
-            {aboutImage?.url && (
+            {aboutImage?.url ? (
               <Image
                 src={aboutImage.url}
                 alt={aboutImage.alt}
@@ -167,8 +168,10 @@ export default async function HomePage() {
                 height={480}
                 className="rounded-2xl object-cover"
               />
+            ) : (
+              <AboutIllustration className="w-full rounded-2xl" />
             )}
-            <div className={aboutImage?.url ? "" : "md:col-span-2"}>
+            <div>
               <h2 className="text-2xl font-extrabold sm:text-3xl">{home.aboutHeading}</h2>
               <p className="mt-4 leading-9 text-ink-700">{home.aboutSummary}</p>
               <ButtonLink href="/about" className="mt-8">

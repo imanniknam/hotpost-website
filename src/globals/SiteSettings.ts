@@ -70,6 +70,21 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "پنل مشتریان",
+          fields: [
+            {
+              name: "customerPortalUrl",
+              type: "text",
+              label: "آدرس ورود مشتریان",
+              defaultValue: "http://customers.h0tpost.ir/",
+              admin: {
+                description:
+                  "پنل کاربری جداگانه مشتریان است، بیرون از این سایت. دکمه «ورود مشتریان» در هدر به همین آدرس می‌رود.",
+              },
+            },
+          ],
+        },
+        {
           label: "فوتر",
           fields: [
             {

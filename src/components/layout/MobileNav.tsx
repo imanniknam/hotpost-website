@@ -4,9 +4,9 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 
-import { NAV_LINKS } from "./Header";
+import { NAV_LINKS } from "./navLinks";
 
-export function MobileNav() {
+export function MobileNav({ customerPortalUrl }: { customerPortalUrl?: string | null }) {
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
 
@@ -51,6 +51,31 @@ export function MobileNav() {
                 {link.label}
               </Link>
             ))}
+
+            {customerPortalUrl && (
+              <>
+                <div className="my-1 border-t border-black/5" />
+                <a
+                  href={customerPortalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-50"
+                >
+                  <svg
+                    className="size-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    aria-hidden="true"
+                  >
+                    <path d="M16 17l5-5-5-5M21 12H9M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" />
+                  </svg>
+                  ورود مشتریان
+                </a>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
