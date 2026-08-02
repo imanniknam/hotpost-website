@@ -54,55 +54,82 @@ export default async function ServicesPage() {
       </section>
 
       <div className="container-hp mt-12 space-y-8">
-        {services.map((service) => (
-          <Reveal key={service.id} scale>
-            <section
-              id={service.slug}
-              className="bg-brand-gradient-soft relative overflow-hidden rounded-3xl p-8 shadow-sm ring-1 ring-black/5 sm:p-10"
-            >
-              {/* Accent rail along the leading edge, RTL-safe via inset-inline-start. */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 start-0 w-1.5 bg-linear-to-b from-brand-400 to-brand-600"
-              />
+        {services.map((service, index) => {
+          const photo = typeof service.photo === "object" ? service.photo : null;
+          // Alternate the photo between the leading and trailing side for
+          // rhythm down the page, rather than pinning every photo to one edge.
+          const photoFirst = index % 2 === 0;
 
-              <div className="flex flex-wrap items-center gap-3">
-                {typeof service.icon === "object" && service.icon?.url && (
-                  <Image
-                    src={service.icon.url}
-                    alt=""
-                    width={48}
-                    height={48}
-                    className="size-12 object-contain"
-                  />
-                )}
-                <h2 className="text-2xl font-extrabold">{service.title}</h2>
-                {service.englishTitle && (
-                  <span className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-bold text-white shadow-sm shadow-brand-500/25">
-                    {service.englishTitle}
-                  </span>
-                )}
-              </div>
-
-              <p className="mt-3 font-medium text-brand-600">{service.tagline}</p>
-              <p className="mt-4 max-w-4xl leading-9 text-ink-700">{service.summary}</p>
-
-              <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                <List title="خدمات شامل" items={service.includes} />
-                <List
-                  title={service.slug === "courier" ? "مدل زمانی و حوزه جغرافیایی" : "پوشش"}
-                  items={service.coverage}
+          return (
+            <Reveal key={service.id} scale>
+              <section
+                id={service.slug}
+                className="bg-brand-gradient-soft relative overflow-hidden rounded-3xl p-8 shadow-sm ring-1 ring-black/5 sm:p-10"
+              >
+                {/* Accent rail along the leading edge, RTL-safe via inset-inline-start. */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 start-0 w-1.5 bg-linear-to-b from-brand-400 to-brand-600"
                 />
-                <List title="مزایا" items={service.benefits} />
-              </div>
 
-              <div className="mt-8 rounded-2xl bg-white/70 p-5 ring-1 ring-black/5 backdrop-blur">
-                <span className="font-bold">بهترین گزینه برای: </span>
-                <span className="text-ink-500">{service.bestFor}</span>
-              </div>
-            </section>
-          </Reveal>
-        ))}
+                <div className={photo?.url ? "grid gap-8 lg:grid-cols-5 lg:items-center" : undefined}>
+                  {photo?.url && (
+                    <div
+                      className={`relative aspect-[3/2] overflow-hidden rounded-2xl shadow-md lg:col-span-2 ${
+                        photoFirst ? "lg:order-first" : "lg:order-last"
+                      }`}
+                    >
+                      <Image
+                        src={photo.url}
+                        alt={photo.alt}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 40vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <div className={photo?.url ? "lg:col-span-3" : undefined}>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {typeof service.icon === "object" && service.icon?.url && (
+                        <Image
+                          src={service.icon.url}
+                          alt=""
+                          width={48}
+                          height={48}
+                          className="size-12 object-contain"
+                        />
+                      )}
+                      <h2 className="text-2xl font-extrabold">{service.title}</h2>
+                      {service.englishTitle && (
+                        <span className="rounded-full bg-brand-gradient px-3 py-1 text-xs font-bold text-white shadow-sm shadow-brand-500/25">
+                          {service.englishTitle}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-3 font-medium text-brand-600">{service.tagline}</p>
+                    <p className="mt-4 leading-9 text-ink-700">{service.summary}</p>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                  <List title="خدمات شامل" items={service.includes} />
+                  <List
+                    title={service.slug === "courier" ? "مدل زمانی و حوزه جغرافیایی" : "پوشش"}
+                    items={service.coverage}
+                  />
+                  <List title="مزایا" items={service.benefits} />
+                </div>
+
+                <div className="mt-8 rounded-2xl bg-white/70 p-5 ring-1 ring-black/5 backdrop-blur">
+                  <span className="font-bold">بهترین گزینه برای: </span>
+                  <span className="text-ink-500">{service.bestFor}</span>
+                </div>
+              </section>
+            </Reveal>
+          );
+        })}
       </div>
 
       <section className="mt-24">

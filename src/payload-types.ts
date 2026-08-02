@@ -304,7 +304,14 @@ export interface Service {
    */
   tagline: string;
   summary: string;
+  /**
+   * آیکون کوچک روی کارت صفحه اصلی.
+   */
   icon?: (number | null) | Media;
+  /**
+   * عکس بزرگ در صفحه خدمات، کنار توضیحات.
+   */
+  photo?: (number | null) | Media;
   benefits?:
     | {
         text: string;
@@ -527,6 +534,7 @@ export interface ServicesSelect<T extends boolean = true> {
   tagline?: T;
   summary?: T;
   icon?: T;
+  photo?: T;
   benefits?:
     | T
     | {

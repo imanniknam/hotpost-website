@@ -57,6 +57,14 @@ export const Services: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "آیکون",
+      admin: { description: "آیکون کوچک روی کارت صفحه اصلی." },
+    },
+    {
+      name: "photo",
+      type: "upload",
+      relationTo: "media",
+      label: "عکس بزرگ",
+      admin: { description: "عکس بزرگ در صفحه خدمات، کنار توضیحات." },
     },
     {
       name: "benefits",
