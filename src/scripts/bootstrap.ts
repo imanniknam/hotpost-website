@@ -18,6 +18,7 @@ import { getPayload } from "payload";
 import { importBrandAssets } from "./brandAssets";
 import { importClientPhotos } from "./clientPhotos";
 import { hasContent, writeContent } from "./content";
+import { importRealProducts } from "./realProducts";
 
 {
   const payload = await getPayload({ config });
@@ -29,11 +30,12 @@ import { hasContent, writeContent } from "./content";
     await writeContent(payload);
   }
 
-  // Both idempotent on their own (check each asset before uploading or
-  // wiring), so it is safe to call them on every deploy rather than gating
-  // on hasContent.
+  // All three are idempotent on their own (check each asset/product before
+  // uploading or creating), so it is safe to call them on every deploy
+  // rather than gating on hasContent.
   await importBrandAssets(payload);
   await importClientPhotos(payload);
+  await importRealProducts(payload);
 
   // Admin user. Skipped silently when the credentials are not configured, so a
   // deploy without them still succeeds — the panel just has no user yet.

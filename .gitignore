@@ -55,3 +55,7 @@ next-env.d.ts
 
 .vercel
 .env*.local
+
+# Raw client-provided WordPress uploads export — source material only, never
+# meant to ship. The curated/optimized subset lives in src/scripts/assets/.
+/2026/

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/cn";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, isPricePending } from "@/lib/format";
 import type { Product } from "@/payload-types";
 
 export function ProductPurchase({ product }: { product: Product }) {
@@ -20,7 +20,9 @@ export function ProductPurchase({ product }: { product: Product }) {
   const variant = variantIndex >= 0 ? variants[variantIndex] : undefined;
   const price = variant?.price ?? product.price;
   const stock = variant ? (variant.stock ?? 0) : (product.stock ?? 0);
+  const pending = isPricePending(price);
   const outOfStock = stock <= 0;
+  const disabled = pending || outOfStock;
 
   const handleAdd = () => {
     const image = product.images?.[0]?.image;
@@ -70,20 +72,28 @@ export function ProductPurchase({ product }: { product: Product }) {
       )}
 
       <div className="nums flex items-baseline gap-3">
-        {product.compareAtPrice && product.compareAtPrice > price && (
-          <span className="text-ink-500 line-through">{formatPrice(product.compareAtPrice)}</span>
+        {pending ? (
+          <span className="text-lg font-bold text-ink-500">قیمت این محصول به‌زودی اعلام می‌شود</span>
+        ) : (
+          <>
+            {product.compareAtPrice && product.compareAtPrice > price && (
+              <span className="text-ink-500 line-through">
+                {formatPrice(product.compareAtPrice)}
+              </span>
+            )}
+            <motion.span
+              // Keyed on price so switching variant animates the number swap.
+              key={price}
+              className="text-brand-gradient text-3xl font-extrabold"
+              initial={reduced ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {formatPrice(price)}
+            </motion.span>
+            <span className="text-sm text-ink-500">تومان</span>
+          </>
         )}
-        <motion.span
-          // Keyed on price so switching variant animates the number swap.
-          key={price}
-          className="text-brand-gradient text-3xl font-extrabold"
-          initial={reduced ? false : { opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {formatPrice(price)}
-        </motion.span>
-        <span className="text-sm text-ink-500">تومان</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -110,25 +120,29 @@ export function ProductPurchase({ product }: { product: Product }) {
         <motion.button
           type="button"
           onClick={handleAdd}
-          disabled={outOfStock}
-          whileHover={outOfStock || reduced ? undefined : { scale: 1.02 }}
-          whileTap={outOfStock || reduced ? undefined : { scale: 0.97 }}
+          disabled={disabled}
+          whileHover={disabled || reduced ? undefined : { scale: 1.02 }}
+          whileTap={disabled || reduced ? undefined : { scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
           className={cn(
             "flex-1 rounded-xl px-6 py-3 text-sm font-bold transition-colors",
-            outOfStock
+            disabled
               ? "cursor-not-allowed bg-surface-muted text-ink-500"
               : added
                 ? "bg-linear-to-l from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/25"
                 : "bg-brand-gradient text-white shadow-md shadow-brand-500/30",
           )}
         >
-          {outOfStock ? "ناموجود" : added ? "به سبد اضافه شد ✓" : "افزودن به سبد خرید"}
+          {pending ? "به‌زودی" : outOfStock ? "ناموجود" : added ? "به سبد اضافه شد ✓" : "افزودن به سبد خرید"}
         </motion.button>
       </div>
 
       <p className="text-sm text-ink-500">
-        {outOfStock ? "این محصول در حال حاضر موجود نیست." : `موجودی: ${formatPrice(stock)} عدد`}
+        {pending
+          ? "برای اطلاع از قیمت و موجودی با ما تماس بگیرید."
+          : outOfStock
+            ? "این محصول در حال حاضر موجود نیست."
+            : `موجودی: ${formatPrice(stock)} عدد`}
       </p>
     </div>
   );

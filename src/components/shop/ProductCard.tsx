@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HoverLift } from "@/components/motion/HoverLift";
-import { discountPercent, formatPrice } from "@/lib/format";
+import { discountPercent, formatPrice, isPricePending } from "@/lib/format";
 import type { Product } from "@/payload-types";
 
 import { AddToCartButton } from "./AddToCartButton";
@@ -19,7 +19,8 @@ export function ProductCard({ product }: { product: Product }) {
     typeof product.images?.[0]?.image === "object" && product.images[0].image !== null
       ? product.images[0].image.alt
       : product.title;
-  const off = discountPercent(product.price, product.compareAtPrice);
+  const pending = isPricePending(product.price);
+  const off = pending ? null : discountPercent(product.price, product.compareAtPrice);
   const category = typeof product.category === "object" ? product.category : null;
 
   return (
@@ -67,15 +68,21 @@ export function ProductCard({ product }: { product: Product }) {
 
           <div className="mt-auto pt-4">
             <div className="nums mb-3 flex items-baseline gap-2">
-              {product.compareAtPrice && off !== null && (
-                <span className="text-sm text-ink-500 line-through">
-                  {formatPrice(product.compareAtPrice)}
-                </span>
+              {pending ? (
+                <span className="text-sm font-bold text-ink-500">قیمت به‌زودی اعلام می‌شود</span>
+              ) : (
+                <>
+                  {product.compareAtPrice && off !== null && (
+                    <span className="text-sm text-ink-500 line-through">
+                      {formatPrice(product.compareAtPrice)}
+                    </span>
+                  )}
+                  <span className="text-brand-gradient text-lg font-extrabold">
+                    {formatPrice(product.price)}
+                  </span>
+                  <span className="text-xs font-medium text-ink-500">تومان</span>
+                </>
               )}
-              <span className="text-brand-gradient text-lg font-extrabold">
-                {formatPrice(product.price)}
-              </span>
-              <span className="text-xs font-medium text-ink-500">تومان</span>
             </div>
 
             <AddToCartButton product={product} />
