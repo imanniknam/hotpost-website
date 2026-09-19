@@ -51,16 +51,24 @@ const db = databaseUrl
  * Uploads go to Vercel Blob in production for the same reason: `public/media`
  * is not writable there. Without the token the plugin is disabled and Payload
  * falls back to writing to disk, which is what local development wants.
+ *
+ * The plugin is registered unconditionally, with `enabled` following the
+ * token, rather than left out when the token is missing. Even disabled, it
+ * adds its client upload handler to the admin panel, so the import map has to
+ * contain that component. The import map is generated locally, where there is
+ * no token: leaving the plugin out there produced an import map without the
+ * handler, and on Vercel, where the token is set, the admin panel then failed
+ * to resolve it and rendered an empty page.
  */
-const storagePlugins = process.env.BLOB_READ_WRITE_TOKEN
-  ? [
-      vercelBlobStorage({
-        enabled: true,
-        collections: { media: true },
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-      }),
-    ]
-  : [];
+const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+const storagePlugins = [
+  vercelBlobStorage({
+    enabled: Boolean(blobToken),
+    collections: { media: true },
+    token: blobToken ?? "",
+  }),
+];
 
 export default buildConfig({
   admin: {
