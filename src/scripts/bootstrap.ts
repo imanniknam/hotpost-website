@@ -39,6 +39,12 @@ import { importRealProducts } from "./realProducts";
 
   // Admin user. Skipped silently when the credentials are not configured, so a
   // deploy without them still succeeds — the panel just has no user yet.
+  //
+  // An existing user is left alone by default, so a password changed in the
+  // panel is not overwritten on the next deploy. Set ADMIN_RESET_PASSWORD=true
+  // to recover a lost password: the user is reset to ADMIN_PASSWORD, made an
+  // admin and unlocked. Remove the variable again afterwards, otherwise every
+  // deploy resets the password.
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
 
@@ -46,11 +52,25 @@ import { importRealProducts } from "./realProducts";
     const existing = await payload.find({
       collection: "users",
       where: { email: { equals: email } },
-      limit: 0,
+      limit: 1,
     });
+    const user = existing.docs[0];
 
-    if (existing.totalDocs > 0) {
-      payload.logger.info(`bootstrap: کاربر ${email} از قبل وجود دارد — رد شد.`);
+    if (user && process.env.ADMIN_RESET_PASSWORD === "true") {
+      await payload.update({
+        collection: "users",
+        id: user.id,
+        // Resetting the counters also clears the lockout Payload applies after
+        // repeated failed logins.
+        data: { password, role: "admin", loginAttempts: 0, lockUntil: null },
+      });
+      payload.logger.info(
+        `bootstrap: رمز کاربر ${email} بازنشانی شد. ADMIN_RESET_PASSWORD را از Vercel حذف کنید.`,
+      );
+    } else if (user) {
+      payload.logger.info(
+        `bootstrap: کاربر ${email} از قبل وجود دارد — رد شد. برای بازنشانی رمز ADMIN_RESET_PASSWORD=true بگذارید.`,
+      );
     } else {
       await payload.create({
         collection: "users",
