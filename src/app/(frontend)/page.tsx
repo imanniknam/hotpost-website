@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,6 +19,15 @@ import {
   getServices,
   getSiteSettings,
 } from "@/lib/queries";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const home = await getHomePage();
+  // No fallback title: the root layout supplies the site-wide default.
+  return {
+    ...(home.seo?.metaTitle ? { title: { absolute: home.seo.metaTitle } } : {}),
+    ...(home.seo?.metaDescription ? { description: home.seo.metaDescription } : {}),
+  };
+}
 
 export default async function HomePage() {
   const [home, services, products, faqs, settings] = await Promise.all([
@@ -45,9 +56,9 @@ export default async function HomePage() {
             <p className="mt-4 text-lg text-ink-500">{home.subheading}</p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <ButtonLink href="/services">خدمات ما ←</ButtonLink>
+              <ButtonLink href="/services">{home.heroPrimaryLabel || "خدمات ما ←"}</ButtonLink>
               <ButtonLink href="#contact" variant="outline">
-                تماس با ما
+                {home.heroSecondaryLabel || "تماس با ما"}
               </ButtonLink>
             </div>
           </Reveal>
@@ -87,10 +98,10 @@ export default async function HomePage() {
       <section className="container-hp mt-24">
         <Reveal>
           <SectionHeading
-            title="خدمات اصلی هات پست"
-            subtitle="چهار مدل خدماتی، متناسب با هر کسب‌وکار"
+            title={home.servicesHeading || "خدمات اصلی هات پست"}
+            subtitle={home.servicesSubheading || "چهار مدل خدماتی، متناسب با هر کسب‌وکار"}
             href="/services"
-            hrefLabel="مشاهده خدمات"
+            hrefLabel={home.servicesLinkLabel || "مشاهده خدمات"}
           />
         </Reveal>
 
@@ -141,8 +152,8 @@ export default async function HomePage() {
         <section className="container-hp mt-24">
           <Reveal>
             <SectionHeading
-              title="اقلام فروشگاه هات پست"
-              subtitle="ملزومات بسته‌بندی، ارسال و تجهیزات چاپ"
+              title={home.shopHeading || "اقلام فروشگاه هات پست"}
+              subtitle={home.shopSubheading || "ملزومات بسته‌بندی، ارسال و تجهیزات چاپ"}
               href="/shop"
             />
           </Reveal>
@@ -175,7 +186,7 @@ export default async function HomePage() {
               <h2 className="text-2xl font-extrabold sm:text-3xl">{home.aboutHeading}</h2>
               <p className="mt-4 leading-9 text-ink-700">{home.aboutSummary}</p>
               <ButtonLink href="/about" className="mt-8">
-                درباره ما ←
+                {home.aboutButtonLabel || "درباره ما ←"}
               </ButtonLink>
             </div>
           </div>
@@ -186,7 +197,7 @@ export default async function HomePage() {
       {faqs.length > 0 && (
         <section className="container-hp mt-24">
           <Reveal>
-            <SectionHeading title="پرسش‌های متداول" className="justify-center text-center" />
+            <SectionHeading title={home.faqHeading || "پرسش‌های متداول"} className="justify-center text-center" />
             <FaqList faqs={faqs} />
           </Reveal>
         </section>

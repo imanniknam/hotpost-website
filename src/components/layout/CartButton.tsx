@@ -9,7 +9,7 @@ import { useHydrated } from "@/lib/useHydrated";
 
 const MotionLink = motion.create(Link);
 
-export function CartButton() {
+export function CartButton({ label = "سبد خرید" }: { label?: string }) {
   const items = useCart((s) => s.items);
   const hydrated = useHydrated();
   const reduced = useReducedMotion();
@@ -19,7 +19,7 @@ export function CartButton() {
     <MotionLink
       href="/cart"
       className="relative inline-flex items-center gap-2 rounded-full bg-brand-gradient-soft px-4 py-2 text-sm font-medium text-brand-700 ring-1 ring-brand-200/70 transition-shadow hover:shadow-md hover:shadow-brand-500/15"
-      aria-label={`سبد خرید${hydrated && count ? `، ${formatPrice(count)} کالا` : ""}`}
+      aria-label={`${label}${hydrated && count ? `، ${formatPrice(count)} کالا` : ""}`}
       whileHover={reduced ? undefined : { scale: 1.04 }}
       whileTap={reduced ? undefined : { scale: 0.96 }}
       transition={{ type: "spring", stiffness: 400, damping: 22 }}
@@ -36,7 +36,7 @@ export function CartButton() {
         <circle cx="10" cy="20" r="1.4" />
         <circle cx="18" cy="20" r="1.4" />
       </svg>
-      <span className="hidden sm:inline">سبد خرید</span>
+      <span className="hidden sm:inline">{label}</span>
 
       <AnimatePresence>
         {hydrated && count > 0 && (

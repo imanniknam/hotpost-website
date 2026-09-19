@@ -15,14 +15,14 @@ export function Footer({ settings }: { settings: SiteSetting }) {
       <div className="container-hp grid gap-10 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="mb-4 flex items-center">
-            <Logo className="h-10 w-auto" />
+            <Logo className="h-10 w-auto" media={settings.logo} />
             <span className="sr-only">هات پست</span>
           </div>
           <p className="max-w-prose text-sm leading-8 text-ink-500">{settings.footerText}</p>
         </div>
 
         <div>
-          <h2 className="mb-4 font-bold">دسترسی سریع</h2>
+          <h2 className="mb-4 font-bold">{settings.quickLinksHeading || "دسترسی سریع"}</h2>
           <ul className="space-y-2 text-sm text-ink-500">
             {settings.quickLinks?.map((link) => (
               <li key={link.id ?? link.href}>
@@ -35,7 +35,7 @@ export function Footer({ settings }: { settings: SiteSetting }) {
         </div>
 
         <div>
-          <h2 className="mb-4 font-bold">تماس با هات پست</h2>
+          <h2 className="mb-4 font-bold">{settings.contactHeading || "تماس با هات پست"}</h2>
           <ul className="space-y-3 text-sm text-ink-500">
             {settings.phones?.map((phone) => (
               <li key={phone.id ?? phone.dial}>
@@ -45,11 +45,13 @@ export function Footer({ settings }: { settings: SiteSetting }) {
               </li>
             ))}
             <li className="pt-2">
-              <span className="block font-medium text-ink-700">روز و ساعت پاسخگویی</span>
+              <span className="block font-medium text-ink-700">
+                {settings.hoursLabel || "روز و ساعت پاسخگویی"}
+              </span>
               {settings.hours}
             </li>
             <li className="pt-2">
-              <span className="block font-medium text-ink-700">آدرس</span>
+              <span className="block font-medium text-ink-700">{settings.addressLabel || "آدرس"}</span>
               {settings.address}
             </li>
           </ul>
@@ -58,7 +60,7 @@ export function Footer({ settings }: { settings: SiteSetting }) {
 
       <div className="border-t border-black/5">
         <div className="container-hp py-5 text-center text-xs text-ink-500">
-          تمامی حقوق برای هات پست محفوظ است.
+          {settings.copyright || "تمامی حقوق برای هات پست محفوظ است."}
         </div>
       </div>
     </footer>

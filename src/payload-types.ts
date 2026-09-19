@@ -98,11 +98,17 @@ export interface Config {
   globals: {
     'home-page': HomePage;
     'about-page': AboutPage;
+    'services-page': ServicesPage;
+    'shop-page': ShopPage;
+    'contact-page': ContactPage;
     'site-settings': SiteSetting;
   };
   globalsSelect: {
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
+    'services-page': ServicesPageSelect<false> | ServicesPageSelect<true>;
+    'shop-page': ShopPageSelect<false> | ShopPageSelect<true>;
+    'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
@@ -360,6 +366,10 @@ export interface Faq {
 export interface User {
   id: number;
   name: string;
+  /**
+   * ویرایشگر می‌تواند محتوا را عوض کند ولی به کاربران دسترسی ندارد.
+   */
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -627,6 +637,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -685,6 +696,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * اولین صفحه‌ای که بازدیدکننده می‌بیند.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-page".
  */
@@ -710,6 +723,28 @@ export interface HomePage {
   aboutHeading?: string | null;
   aboutSummary: string;
   aboutImage?: (number | null) | Media;
+  heroPrimaryLabel?: string | null;
+  heroSecondaryLabel?: string | null;
+  servicesHeading?: string | null;
+  servicesSubheading?: string | null;
+  servicesLinkLabel?: string | null;
+  shopHeading?: string | null;
+  shopSubheading?: string | null;
+  aboutButtonLabel?: string | null;
+  faqHeading?: string | null;
+  /**
+   * عنوان و توضیحی که در نتایج گوگل و هنگام اشتراک‌گذاری لینک نمایش داده می‌شود. خالی بماند از متن پیش‌فرض استفاده می‌شود.
+   */
+  seo?: {
+    /**
+     * بهتر است کمتر از ۶۰ کاراکتر باشد.
+     */
+    metaTitle?: string | null;
+    /**
+     * بهتر است بین ۱۲۰ تا ۱۶۰ کاراکتر باشد.
+     */
+    metaDescription?: string | null;
+  };
   closingText: string;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -737,10 +772,116 @@ export interface AboutPage {
     };
     [k: string]: unknown;
   };
+  /**
+   * عنوان و توضیحی که در نتایج گوگل و هنگام اشتراک‌گذاری لینک نمایش داده می‌شود. خالی بماند از متن پیش‌فرض استفاده می‌شود.
+   */
+  seo?: {
+    /**
+     * بهتر است کمتر از ۶۰ کاراکتر باشد.
+     */
+    metaTitle?: string | null;
+    /**
+     * بهتر است بین ۱۲۰ تا ۱۶۰ کاراکتر باشد.
+     */
+    metaDescription?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
+ * متن بالای صفحه «خدمات». خود خدمت‌ها از بخش «خدمات» در منوی محتوا ویرایش می‌شوند.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-page".
+ */
+export interface ServicesPage {
+  id: number;
+  heading: string;
+  intro?: string | null;
+  includesLabel?: string | null;
+  benefitsLabel?: string | null;
+  coverageLabel?: string | null;
+  courierCoverageLabel?: string | null;
+  bestForLabel?: string | null;
+  /**
+   * عنوان و توضیحی که در نتایج گوگل و هنگام اشتراک‌گذاری لینک نمایش داده می‌شود. خالی بماند از متن پیش‌فرض استفاده می‌شود.
+   */
+  seo?: {
+    /**
+     * بهتر است کمتر از ۶۰ کاراکتر باشد.
+     */
+    metaTitle?: string | null;
+    /**
+     * بهتر است بین ۱۲۰ تا ۱۶۰ کاراکتر باشد.
+     */
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * متن بالای صفحه «فروشگاه». محصولات و دسته‌بندی‌ها از منوی «فروشگاه» ویرایش می‌شوند.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-page".
+ */
+export interface ShopPage {
+  id: number;
+  heading: string;
+  intro?: string | null;
+  allProductsHeading?: string | null;
+  emptyText?: string | null;
+  /**
+   * عنوان و توضیحی که در نتایج گوگل و هنگام اشتراک‌گذاری لینک نمایش داده می‌شود. خالی بماند از متن پیش‌فرض استفاده می‌شود.
+   */
+  seo?: {
+    /**
+     * بهتر است کمتر از ۶۰ کاراکتر باشد.
+     */
+    metaTitle?: string | null;
+    /**
+     * بهتر است بین ۱۲۰ تا ۱۶۰ کاراکتر باشد.
+     */
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * شماره‌ها، آدرس و ساعت کاری از «تنظیمات سایت» ویرایش می‌شوند؛ اینجا فقط متن‌های این صفحه است.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page".
+ */
+export interface ContactPage {
+  id: number;
+  heading: string;
+  /**
+   * خالی بماند، تیتر و زیرتیتر بخش پشتیبانی (در تنظیمات سایت) نمایش داده می‌شود.
+   */
+  intro?: string | null;
+  phonesLabel?: string | null;
+  hoursLabel?: string | null;
+  addressLabel?: string | null;
+  /**
+   * عنوان و توضیحی که در نتایج گوگل و هنگام اشتراک‌گذاری لینک نمایش داده می‌شود. خالی بماند از متن پیش‌فرض استفاده می‌شود.
+   */
+  seo?: {
+    /**
+     * بهتر است کمتر از ۶۰ کاراکتر باشد.
+     */
+    metaTitle?: string | null;
+    /**
+     * بهتر است بین ۱۲۰ تا ۱۶۰ کاراکتر باشد.
+     */
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * اطلاعات تماس، منو، لوگو و فوتر که در همه صفحه‌ها نمایش داده می‌شوند.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
@@ -767,7 +908,31 @@ export interface SiteSetting {
    * پنل کاربری جداگانه مشتریان است، بیرون از این سایت. دکمه «ورود مشتریان» در هدر به همین آدرس می‌رود.
    */
   customerPortalUrl?: string | null;
+  /**
+   * اختیاری. خالی بماند لوگوی پیش‌فرض هات پست نمایش داده می‌شود. ترجیحاً PNG یا SVG با پس‌زمینه شفاف.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * خالی بماند منوی پیش‌فرض (خانه، خدمات، فروشگاه، درباره ما، تماس با ما) نمایش داده می‌شود.
+   */
+  navLinks?:
+    | {
+        label: string;
+        /**
+         * مثال: /services
+         */
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  customerPortalLabel?: string | null;
+  cartLabel?: string | null;
   footerText: string;
+  quickLinksHeading?: string | null;
+  contactHeading?: string | null;
+  hoursLabel?: string | null;
+  addressLabel?: string | null;
+  copyright?: string | null;
   quickLinks?:
     | {
         label: string;
@@ -799,6 +964,21 @@ export interface HomePageSelect<T extends boolean = true> {
   aboutHeading?: T;
   aboutSummary?: T;
   aboutImage?: T;
+  heroPrimaryLabel?: T;
+  heroSecondaryLabel?: T;
+  servicesHeading?: T;
+  servicesSubheading?: T;
+  servicesLinkLabel?: T;
+  shopHeading?: T;
+  shopSubheading?: T;
+  aboutButtonLabel?: T;
+  faqHeading?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
   closingText?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -812,6 +992,73 @@ export interface AboutPageSelect<T extends boolean = true> {
   heading?: T;
   image?: T;
   body?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-page_select".
+ */
+export interface ServicesPageSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  includesLabel?: T;
+  benefitsLabel?: T;
+  coverageLabel?: T;
+  courierCoverageLabel?: T;
+  bestForLabel?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-page_select".
+ */
+export interface ShopPageSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  allProductsHeading?: T;
+  emptyText?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page_select".
+ */
+export interface ContactPageSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  phonesLabel?: T;
+  hoursLabel?: T;
+  addressLabel?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -833,7 +1080,22 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   supportHeading?: T;
   supportSubheading?: T;
   customerPortalUrl?: T;
+  logo?: T;
+  navLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  customerPortalLabel?: T;
+  cartLabel?: T;
   footerText?: T;
+  quickLinksHeading?: T;
+  contactHeading?: T;
+  hoursLabel?: T;
+  addressLabel?: T;
+  copyright?: T;
   quickLinks?:
     | T
     | {

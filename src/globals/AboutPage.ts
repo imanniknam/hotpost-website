@@ -1,11 +1,12 @@
 import type { GlobalConfig } from "payload";
 
+import { seoField } from "../fields/seo";
 import { globalRevalidationHooks } from "../hooks/revalidate";
 
 export const AboutPage: GlobalConfig = {
   slug: "about-page",
   label: "صفحه درباره ما",
-  admin: { group: "محتوا" },
+  admin: { group: "صفحات سایت" },
   access: { read: () => true },
   hooks: globalRevalidationHooks,
   fields: [
@@ -28,5 +29,6 @@ export const AboutPage: GlobalConfig = {
       label: "متن کامل",
       required: true,
     },
+    seoField(),
   ],
 };

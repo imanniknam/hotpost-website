@@ -5,23 +5,25 @@ import { getSiteSettings } from "@/lib/queries";
 import { CartButton } from "./CartButton";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
-import { NAV_LINKS } from "./navLinks";
+import { resolveNavLinks } from "./navLinks";
 
 // getSiteSettings is wrapped in React's cache(), so the layout's own call for
 // the footer and this one dedupe into a single query per request.
 export async function Header() {
   const settings = await getSiteSettings();
+  const navLinks = resolveNavLinks(settings.navLinks);
+  const portalLabel = settings.customerPortalLabel || "ورود مشتریان";
 
   return (
     <header className="sticky top-0 z-40 border-b border-black/5 bg-white/80 backdrop-blur-xl">
       <div className="container-hp flex h-16 items-center gap-2 sm:gap-4">
         <Link href="/" className="flex shrink-0 items-center transition-opacity hover:opacity-80">
-          <Logo className="h-8 w-auto sm:h-9" />
+          <Logo className="h-8 w-auto sm:h-9" media={settings.logo} />
           <span className="sr-only">هات پست</span>
         </Link>
 
         <nav className="hidden flex-1 items-center gap-1 md:flex" aria-label="ناوبری اصلی">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -52,11 +54,15 @@ export async function Header() {
               >
                 <path d="M16 17l5-5-5-5M21 12H9M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" />
               </svg>
-              ورود مشتریان
+              {portalLabel}
             </a>
           )}
-          <CartButton />
-          <MobileNav customerPortalUrl={settings.customerPortalUrl} />
+          <CartButton label={settings.cartLabel || undefined} />
+          <MobileNav
+            links={navLinks}
+            customerPortalUrl={settings.customerPortalUrl}
+            customerPortalLabel={portalLabel}
+          />
         </div>
       </div>
     </header>

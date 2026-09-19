@@ -54,7 +54,7 @@ import { importRealProducts } from "./realProducts";
     } else {
       await payload.create({
         collection: "users",
-        data: { email, password, name: process.env.ADMIN_NAME || "مدیر" },
+        data: { email, password, name: process.env.ADMIN_NAME || "مدیر", role: "admin" },
       });
       payload.logger.info(`bootstrap: کاربر ادمین ساخته شد (${email}).`);
     }

@@ -5,13 +5,20 @@ import Image from "next/image";
 import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { SupportBanner } from "@/components/ui/SupportBanner";
-import { getServices, getSiteSettings } from "@/lib/queries";
+import { pageMetadata } from "@/lib/pageMetadata";
+import { getServices, getServicesPage, getSiteSettings } from "@/lib/queries";
 
-export const metadata: Metadata = {
-  title: "خدمات هات پست",
-  description:
-    "پس‌کرایه، تسویه درب منزل (COD)، فول‌فیلمنت و پیک اختصاصی — خدمات پستی هات پست با انتخاب بهترین اپراتور از بین تیپاکس، چاپار، پینکس، ماهکس و پست جمهوری اسلامی.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getServicesPage();
+  return pageMetadata(page.seo, {
+    title: "خدمات هات پست",
+    description:
+      "پس‌کرایه، تسویه درب منزل (COD)، فول‌فیلمنت و پیک اختصاصی — خدمات پستی هات پست با انتخاب بهترین اپراتور از بین تیپاکس، چاپار، پینکس، ماهکس و پست جمهوری اسلامی.",
+  });
+}
+
+const DEFAULT_INTRO =
+  "خدمات پستی مختلف با انتخاب بهترین اپراتور از بین تیپاکس، چاپار، پینکس، ماهکس و ... انجام می‌شود.";
 
 function List({ title, items }: { title: string; items?: { text: string; id?: string | null }[] | null }) {
   if (!items?.length) return null;
@@ -39,17 +46,20 @@ function List({ title, items }: { title: string; items?: { text: string; id?: st
 }
 
 export default async function ServicesPage() {
-  const [services, settings] = await Promise.all([getServices(), getSiteSettings()]);
+  const [services, settings, page] = await Promise.all([
+    getServices(),
+    getSiteSettings(),
+    getServicesPage(),
+  ]);
 
   return (
     <>
       <section className="container-hp pt-10">
         <Reveal y={0}>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">خدمات هات پست</h1>
-          <p className="mt-4 max-w-3xl leading-9 text-ink-500">
-            خدمات پستی مختلف با انتخاب بهترین اپراتور از بین تیپاکس، چاپار، پینکس، ماهکس و ... انجام
-            می‌شود.
-          </p>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{page.heading || "خدمات هات پست"}</h1>
+          {(page.intro ?? DEFAULT_INTRO) && (
+            <p className="mt-4 max-w-3xl leading-9 text-ink-500">{page.intro ?? DEFAULT_INTRO}</p>
+          )}
         </Reveal>
       </section>
 
@@ -114,16 +124,20 @@ export default async function ServicesPage() {
                 </div>
 
                 <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                  <List title="خدمات شامل" items={service.includes} />
+                  <List title={page.includesLabel || "خدمات شامل"} items={service.includes} />
                   <List
-                    title={service.slug === "courier" ? "مدل زمانی و حوزه جغرافیایی" : "پوشش"}
+                    title={
+                      service.slug === "courier"
+                        ? page.courierCoverageLabel || "مدل زمانی و حوزه جغرافیایی"
+                        : page.coverageLabel || "پوشش"
+                    }
                     items={service.coverage}
                   />
-                  <List title="مزایا" items={service.benefits} />
+                  <List title={page.benefitsLabel || "مزایا"} items={service.benefits} />
                 </div>
 
                 <div className="mt-8 rounded-2xl bg-white/70 p-5 ring-1 ring-black/5 backdrop-blur">
-                  <span className="font-bold">بهترین گزینه برای: </span>
+                  <span className="font-bold">{page.bestForLabel || "بهترین گزینه برای:"} </span>
                   <span className="text-ink-500">{service.bestFor}</span>
                 </div>
               </section>

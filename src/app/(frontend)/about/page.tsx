@@ -5,13 +5,17 @@ import Image from "next/image";
 
 import { Reveal } from "@/components/motion/Reveal";
 import { SupportBanner } from "@/components/ui/SupportBanner";
+import { pageMetadata } from "@/lib/pageMetadata";
 import { getAboutPage, getSiteSettings } from "@/lib/queries";
 
-export const metadata: Metadata = {
-  title: "درباره ما",
-  description:
-    "هات پست حاصل بیش از ۳۰ سال تجربه مدیریتی در منطقه ۱۸ پستی و ۱۱ سال فعالیت مستمر در پیشخوان دولت است.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAboutPage();
+  return pageMetadata(about.seo, {
+    title: "درباره ما",
+    description:
+      "هات پست حاصل بیش از ۳۰ سال تجربه مدیریتی در منطقه ۱۸ پستی و ۱۱ سال فعالیت مستمر در پیشخوان دولت است.",
+  });
+}
 
 export default async function AboutPage() {
   const [about, settings] = await Promise.all([getAboutPage(), getSiteSettings()]);

@@ -1,6 +1,17 @@
 import { cache } from "react";
 
-import type { AboutPage, Faq, HomePage, Product, ProductCategory, Service, SiteSetting } from "@/payload-types";
+import type {
+  AboutPage,
+  ContactPage,
+  Faq,
+  HomePage,
+  Product,
+  ProductCategory,
+  Service,
+  ServicesPage,
+  ShopPage,
+  SiteSetting,
+} from "@/payload-types";
 
 import { getPayload } from "./payload";
 
@@ -137,4 +148,19 @@ export const getProductBySlug = cache(async (slug: string): Promise<Product | nu
     depth: 2,
   });
   return docs[0] ?? null;
+});
+
+export const getServicesPage = cache(async (): Promise<ServicesPage> => {
+  const payload = await getPayload();
+  return payload.findGlobal({ slug: "services-page", depth: 0 });
+});
+
+export const getShopPage = cache(async (): Promise<ShopPage> => {
+  const payload = await getPayload();
+  return payload.findGlobal({ slug: "shop-page", depth: 0 });
+});
+
+export const getContactPage = cache(async (): Promise<ContactPage> => {
+  const payload = await getPayload();
+  return payload.findGlobal({ slug: "contact-page", depth: 0 });
 });

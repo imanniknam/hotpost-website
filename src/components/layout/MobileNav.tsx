@@ -4,9 +4,17 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 
-import { NAV_LINKS } from "./navLinks";
+import type { NavLink } from "./navLinks";
 
-export function MobileNav({ customerPortalUrl }: { customerPortalUrl?: string | null }) {
+export function MobileNav({
+  links,
+  customerPortalUrl,
+  customerPortalLabel,
+}: {
+  links: NavLink[];
+  customerPortalUrl?: string | null;
+  customerPortalLabel: string;
+}) {
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
 
@@ -38,7 +46,7 @@ export function MobileNav({ customerPortalUrl }: { customerPortalUrl?: string | 
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8, scaleY: 0.96 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
-            {NAV_LINKS.map((link) => (
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -72,7 +80,7 @@ export function MobileNav({ customerPortalUrl }: { customerPortalUrl?: string | 
                   >
                     <path d="M16 17l5-5-5-5M21 12H9M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" />
                   </svg>
-                  ورود مشتریان
+                  {customerPortalLabel}
                 </a>
               </>
             )}

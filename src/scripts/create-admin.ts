@@ -32,7 +32,7 @@ const [email, password, name] = process.argv.slice(2);
 
   await payload.create({
     collection: "users",
-    data: { email, password, name: name || "مدیر" },
+    data: { email, password, name: name || "مدیر", role: "admin" },
   });
 
   console.log(`✅ کاربر ادمین ساخته شد: ${email}`);

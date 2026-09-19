@@ -29,11 +29,13 @@ export function SupportBanner({ settings }: { settings: SiteSetting }) {
 
         <dl className="relative grid content-center gap-5 text-sm">
           <div>
-            <dt className="mb-1 font-bold text-brand-300">روز و ساعت پاسخگویی</dt>
+            <dt className="mb-1 font-bold text-brand-300">
+              {settings.hoursLabel || "روز و ساعت پاسخگویی"}
+            </dt>
             <dd className="text-white/80">{settings.hours}</dd>
           </div>
           <div>
-            <dt className="mb-1 font-bold text-brand-300">آدرس</dt>
+            <dt className="mb-1 font-bold text-brand-300">{settings.addressLabel || "آدرس"}</dt>
             <dd className="text-white/80">{settings.address}</dd>
           </div>
         </dl>

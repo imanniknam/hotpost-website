@@ -5,7 +5,7 @@ import { globalRevalidationHooks } from "../hooks/revalidate";
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
   label: "تنظیمات سایت",
-  admin: { group: "محتوا" },
+  admin: { group: "تنظیمات", description: "اطلاعات تماس، منو، لوگو و فوتر که در همه صفحه‌ها نمایش داده می‌شوند." },
   access: { read: () => true },
   hooks: globalRevalidationHooks,
   fields: [
@@ -85,6 +85,46 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "هدر و منو",
+          fields: [
+            {
+              name: "logo",
+              type: "upload",
+              relationTo: "media",
+              label: "لوگو",
+              admin: { description: "اختیاری. خالی بماند لوگوی پیش‌فرض هات پست نمایش داده می‌شود. ترجیحاً PNG یا SVG با پس‌زمینه شفاف." },
+            },
+            {
+              name: "navLinks",
+              type: "array",
+              label: "لینک‌های منوی بالا",
+              labels: { singular: "لینک", plural: "لینک‌ها" },
+              admin: { description: "خالی بماند منوی پیش‌فرض (خانه، خدمات، فروشگاه، درباره ما، تماس با ما) نمایش داده می‌شود." },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    { name: "label", type: "text", label: "عنوان", required: true, admin: { width: "50%" } },
+                    { name: "href", type: "text", label: "مسیر", required: true, admin: { width: "50%", description: "مثال: /services" } },
+                  ],
+                },
+              ],
+            },
+            {
+              name: "customerPortalLabel",
+              type: "text",
+              label: "نوشته دکمه ورود مشتریان",
+              defaultValue: "ورود مشتریان",
+            },
+            {
+              name: "cartLabel",
+              type: "text",
+              label: "نوشته دکمه سبد خرید",
+              defaultValue: "سبد خرید",
+            },
+          ],
+        },
+        {
           label: "فوتر",
           fields: [
             {
@@ -93,6 +133,11 @@ export const SiteSettings: GlobalConfig = {
               label: "متن معرفی فوتر",
               required: true,
             },
+            { name: "quickLinksHeading", type: "text", label: "تیتر ستون دسترسی سریع", defaultValue: "دسترسی سریع" },
+            { name: "contactHeading", type: "text", label: "تیتر ستون تماس", defaultValue: "تماس با هات پست" },
+            { name: "hoursLabel", type: "text", label: "برچسب «روز و ساعت پاسخگویی»", defaultValue: "روز و ساعت پاسخگویی" },
+            { name: "addressLabel", type: "text", label: "برچسب «آدرس»", defaultValue: "آدرس" },
+            { name: "copyright", type: "text", label: "متن کپی‌رایت", defaultValue: "تمامی حقوق برای هات پست محفوظ است." },
             {
               name: "quickLinks",
               type: "array",

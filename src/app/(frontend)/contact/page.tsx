@@ -3,23 +3,27 @@ import type { Metadata } from "next";
 import { HoverLift } from "@/components/motion/HoverLift";
 import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
-import { getSiteSettings } from "@/lib/queries";
+import { pageMetadata } from "@/lib/pageMetadata";
+import { getContactPage, getSiteSettings } from "@/lib/queries";
 
-export const metadata: Metadata = {
-  title: "تماس با ما",
-  description: "شماره تماس، آدرس و ساعات پاسخگویی هات پست.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getContactPage();
+  return pageMetadata(page.seo, {
+    title: "تماس با ما",
+    description: "شماره تماس، آدرس و ساعات پاسخگویی هات پست.",
+  });
+}
 
 export default async function ContactPage() {
-  const settings = await getSiteSettings();
+  const [settings, page] = await Promise.all([getSiteSettings(), getContactPage()]);
 
   return (
     <>
       <section className="container-hp pt-10">
         <Reveal y={0}>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">تماس با ما</h1>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{page.heading || "تماس با ما"}</h1>
           <p className="mt-4 text-lg text-ink-500">
-            {settings.supportHeading} {settings.supportSubheading}
+            {page.intro || `${settings.supportHeading} ${settings.supportSubheading}`}
           </p>
         </Reveal>
       </section>
@@ -28,7 +32,7 @@ export default async function ContactPage() {
         <StaggerItem className="h-full">
           <HoverLift className="h-full">
             <div className="bg-brand-gradient-soft h-full rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
-              <h2 className="mb-4 font-bold">شماره تماس</h2>
+              <h2 className="mb-4 font-bold">{page.phonesLabel || "شماره تماس"}</h2>
               <ul className="space-y-2">
                 {settings.phones?.map((phone) => (
                   <li key={phone.id ?? phone.dial}>
@@ -48,7 +52,7 @@ export default async function ContactPage() {
         <StaggerItem className="h-full">
           <HoverLift className="h-full">
             <div className="h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-              <h2 className="mb-4 font-bold">روز و ساعت پاسخگویی</h2>
+              <h2 className="mb-4 font-bold">{page.hoursLabel || "روز و ساعت پاسخگویی"}</h2>
               <p className="leading-8 text-ink-500">{settings.hours}</p>
             </div>
           </HoverLift>
@@ -57,7 +61,7 @@ export default async function ContactPage() {
         <StaggerItem className="h-full">
           <HoverLift className="h-full">
             <div className="h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-              <h2 className="mb-4 font-bold">آدرس</h2>
+              <h2 className="mb-4 font-bold">{page.addressLabel || "آدرس"}</h2>
               <p className="leading-8 text-ink-500">{settings.address}</p>
             </div>
           </HoverLift>

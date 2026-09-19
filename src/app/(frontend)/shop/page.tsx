@@ -7,25 +7,35 @@ import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { getAllProducts, getCategoryTree } from "@/lib/queries";
+import { pageMetadata } from "@/lib/pageMetadata";
+import { getAllProducts, getCategoryTree, getShopPage } from "@/lib/queries";
 
-export const metadata: Metadata = {
-  title: "فروشگاه هات پست",
-  description:
-    "هات پست پک (ملزومات بسته‌بندی و ارسال) و هات پست چاپ (تجهیزات چاپ و لیبل) — کارتن پستی، پاکت پستی، چسب، لیبل، ریبون، پرینتر و کارتریج.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getShopPage();
+  return pageMetadata(page.seo, {
+    title: "فروشگاه هات پست",
+    description:
+      "هات پست پک (ملزومات بسته‌بندی و ارسال) و هات پست چاپ (تجهیزات چاپ و لیبل) — کارتن پستی، پاکت پستی، چسب، لیبل، ریبون، پرینتر و کارتریج.",
+  });
+}
+
+const DEFAULT_INTRO = "هر چه برای بسته‌بندی، برچسب‌زنی و ارسال مرسولات لازم دارید — یکجا.";
 
 export default async function ShopPage() {
-  const [tree, products] = await Promise.all([getCategoryTree(), getAllProducts(1, 24)]);
+  const [tree, products, page] = await Promise.all([
+    getCategoryTree(),
+    getAllProducts(1, 24),
+    getShopPage(),
+  ]);
 
   return (
     <>
       <section className="container-hp pt-10">
         <Reveal y={0}>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">فروشگاه هات پست</h1>
-          <p className="mt-4 max-w-3xl leading-9 text-ink-500">
-            هر چه برای بسته‌بندی، برچسب‌زنی و ارسال مرسولات لازم دارید — یکجا.
-          </p>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{page.heading || "فروشگاه هات پست"}</h1>
+          {(page.intro ?? DEFAULT_INTRO) && (
+            <p className="mt-4 max-w-3xl leading-9 text-ink-500">{page.intro ?? DEFAULT_INTRO}</p>
+          )}
         </Reveal>
       </section>
 
@@ -61,13 +71,13 @@ export default async function ShopPage() {
       {/* All products */}
       <section className="container-hp mt-20">
         <Reveal>
-          <SectionHeading title="همه محصولات" />
+          <SectionHeading title={page.allProductsHeading || "همه محصولات"} />
         </Reveal>
 
         {products.docs.length === 0 ? (
           <Reveal>
             <p className="bg-brand-gradient-soft rounded-2xl p-10 text-center text-ink-500 ring-1 ring-black/5">
-              هنوز محصولی ثبت نشده است.
+              {page.emptyText || "هنوز محصولی ثبت نشده است."}
             </p>
           </Reveal>
         ) : (

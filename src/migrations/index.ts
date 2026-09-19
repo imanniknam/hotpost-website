@@ -1,6 +1,7 @@
 import * as migration_20260801_115408_initial from './20260801_115408_initial';
 import * as migration_20260802_173409_add_customer_portal_url from './20260802_173409_add_customer_portal_url';
 import * as migration_20260802_232343_add_service_photo from './20260802_232343_add_service_photo';
+import * as migration_20260919_145323_content_editing_and_roles from './20260919_145323_content_editing_and_roles';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20260802_232343_add_service_photo.up,
     down: migration_20260802_232343_add_service_photo.down,
-    name: '20260802_232343_add_service_photo'
+    name: '20260802_232343_add_service_photo',
+  },
+  {
+    up: migration_20260919_145323_content_editing_and_roles.up,
+    down: migration_20260919_145323_content_editing_and_roles.down,
+    name: '20260919_145323_content_editing_and_roles'
   },
 ];
